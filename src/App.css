@@ -1,0 +1,126 @@
+html, body {
+    font-family: Verdana, sans-serif;
+}
+
+.container {
+    width: 100%;
+    text-align: center;
+    outline: 0px solid transparent;
+    margin-top: 10px;
+}
+.container:focus {
+    outline: 0px solid transparent;
+}
+
+.mainDiv {
+    display: inline-block;
+    width: 300px;
+    text-align: left;
+    vertical-align: top;
+    margin: 0 20px;
+}
+
+.wordListDiv {
+    display: inline-block;
+    width: 225px;
+    text-align: left;
+    vertical-align: top;
+    margin-left: 20px;
+}
+
+.pageDiv {
+    display: inline-block;
+    padding: 0 5px;
+    font-size: 20px;
+    font-weight: bold;
+    height: 650px;
+    background-color: #ddd;
+    cursor: pointer;
+}
+.pageDiv:hover {
+    background-color: #bbb;
+}
+
+.word {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+.word-selected {
+    background-color: lightblue;
+    border: 1px solid darkblue;
+}
+
+.word-unclassified {
+    color: black;
+}
+.word-lively {
+    color: seagreen;
+}
+.word-good {
+    color: #666;
+}
+.word-okay {
+    color: darkgoldenrod;
+}
+.word-iffy {
+    color: sienna;
+}
+
+.category {
+    display: inline-block;
+    background-color: white;
+    border: 1px solid #666;
+    border-radius: 5px;
+    font-size: 12px;
+    padding: 0 5px;
+    margin-left: 10px;
+    color: black;
+}
+.category-selected {
+    background-color: lightcoral;
+}
+
+.clue {
+    margin: 10px 0;
+    font-size: 11px;
+}
+
+.action_button {
+    font-size: 16px;
+    border: 2px darkblue solid;
+    background-color: lightblue;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.my_textbox {
+    font-size: 16px;
+    border: 1px darkgray solid;
+    border-radius: 5px;
+    font-family: Verdana, sans-serif;
+    display: inline-block;
+    margin-left: 200px;
+    padding: 5px;
+}
+
+.qc_filters {
+    display:inline-block;
+    margin-left: 20px;
+}
+.qc_filter {
+    margin-left: 20px;
+    display: inline-block;
+}
+.qc_filter input {
+    margin-right: 5px
+}
+
+.list_length {
+    font-family: Verdana, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    display: inline-block;
+    margin-left: 20px
+}
