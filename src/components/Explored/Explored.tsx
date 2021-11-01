@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { discoveredQuery } from '../../api/api';
-import { deepClone, mapValues } from '../../App';
-import { getDictScoreForEntry } from '../../lib/utils';
+import { deepClone, getDictScoreForEntry, mapKeys, mapValues } from '../../lib/utils';
 import { Entry } from '../../models/Entry';
 import EntryComp from '../EntryComp/EntryComp';
-import './App.css';
+import './Explored.scss';
 import { ExploredProps } from './ExploredProps';
 
 function Explored(props: ExploredProps) {
@@ -14,7 +13,7 @@ function Explored(props: ExploredProps) {
     const [exportOnlyChanges, setExportOnlyChanges] = useState(true);
     const [exportOnlySelected, setExportOnlySelected] = useState(false);
 
-    const entryArray: Entry[] = [];
+    let entryArray = generateEntryArray();
 
     useEffect(() => {
         async function doDiscoveredQuery() {
@@ -30,6 +29,24 @@ function Explored(props: ExploredProps) {
 
         doDiscoveredQuery();
     }, [props.query]);
+
+    function generateEntryArray(): Entry[] {
+        let ret = [] as Entry[];
+        if (entries.size === 0) return ret;
+
+        let scoreDict = new Map<string, number>();
+        for (let key of mapKeys(entries)) {
+            let entry = entries.get(key)!;
+            scoreDict.set(entry.entry, getDictScoreForEntry(entry));
+        }
+
+        let sorted = mapKeys(scoreDict).sort((a, b) => scoreDict.get(b)! - scoreDict.get(a)!);
+        for (let key of sorted) {
+            ret.push(entries.get(key)!);
+        }
+
+        return ret;
+    }
 
     function handleEntryClick(event: any) {
         let target = event.target;
@@ -75,51 +92,51 @@ function Explored(props: ExploredProps) {
         if (selectedEntries.length === 0) return;
 
         if (key === "W") {
-            for (var entry of selectedEntries)
+            for (let entry of selectedEntries)
                 entry.qualityScore = 5;
         }
         if (key === "A") {
-            for (var entry of selectedEntries)
+            for (let entry of selectedEntries)
                 entry.qualityScore = 2;
         }
         if (key === "S") {
-            for (var entry of selectedEntries)
+            for (let entry of selectedEntries)
                 entry.qualityScore = 3;
         }
         if (key === "D") {
-            for (var entry of selectedEntries)
+            for (let entry of selectedEntries)
                 entry.qualityScore = 4;
         }
         if (key === "Z") {
-            for (var entry of selectedEntries)
+            for (let entry of selectedEntries)
                 entry.qualityScore = 1;
         }
         if (key === "X") {
-            for (var entry of selectedEntries)
+            for (let entry of selectedEntries)
                 entry.qualityScore = 0;
         }
         if (key === "0") {
-            for (var entry of selectedEntries)
+            for (let entry of selectedEntries)
                 entry.obscurityScore = 0;
         }
         if (key === "1") {
-            for (var entry of selectedEntries)
+            for (let entry of selectedEntries)
                 entry.obscurityScore = 1;
         }
         if (key === "2") {
-            for (var entry of selectedEntries)
+            for (let entry of selectedEntries)
                 entry.obscurityScore = 2;
         }
         if (key === "3") {
-            for (var entry of selectedEntries)
+            for (let entry of selectedEntries)
                 entry.obscurityScore = 3;
         }
         if (key === "4") {
-            for (var entry of selectedEntries)
+            for (let entry of selectedEntries)
                 entry.obscurityScore = 4;
         }
         if (key === "5") {
-            for (var entry of selectedEntries)
+            for (let entry of selectedEntries)
                 entry.obscurityScore = 5;
         }
 
@@ -161,15 +178,13 @@ function Explored(props: ExploredProps) {
                     <label htmlFor="onlySelected">Only Selected</label>
                 </div>
             </div>
-            <div id="container" className="container" onKeyDown={handleKeyDown} onClick={handleEntryClick} tabIndex={0}>
+            <div onKeyDown={handleKeyDown} onClick={handleEntryClick} tabIndex={0}>
                 {isLoading &&
                     <div>Loading...</div>
                 }
-                {entries.size && entryArray.map(entry => {
-                    <div key={entry.entry} data-entrykey={entry.entry}>
-                        <EntryComp entry={entry}></EntryComp>
-                    </div>
-                })}
+                {entryArray.map(entry => (
+                    <EntryComp key={entry.entry} entry={entry}></EntryComp>
+                ))}
             </div>
         </div>
     );

@@ -6,8 +6,9 @@ export async function discoveredQuery(query: string): Promise<Entry[]> {
     return asteroids.map((x, i) => ({
         entry: x.toUpperCase(),
         displayText: x,
-        qualityScore: i / 2,
-        obscurityScore: i / 2,
+        qualityScore: 5 - ((i+1) / 2),
+        obscurityScore: (i+1) / 2,
+        isExplored: true,
     }) as Entry);
 }
 

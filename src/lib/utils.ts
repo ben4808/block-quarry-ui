@@ -38,8 +38,9 @@ export function mapValues<TKey, TVal>(map: Map<TKey, TVal>): TVal[] {
 }
 
 export function getDictScoreForEntry(entry: Entry): number {
+    if (!entry.qualityScore || !entry.obscurityScore) return 0;
     let quality = entry.qualityScore ? (entry.qualityScore - 1)*25 : 25;
     let obscurity = entry.obscurityScore ? (entry.obscurityScore - 1)*25 : 25;
     let finalScore = (2*quality + obscurity) / 3;
-    return Math.round(finalScore * 100) / 100;
+    return Math.round(finalScore);
 }

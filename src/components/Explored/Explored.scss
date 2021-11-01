@@ -1,3 +1,39 @@
 #Explored {
+    display: inline-block;
+    clear: both;
+    font-family: Verdana, sans-serif;
+    border-right: 2px solid #ccc;
+    width: 300px;
+    min-height: 725px;
+    overflow-y: scroll;
+}
 
+#topbar {
+    background-color: #eee;
+    padding: 5px 0 0 15px;
+}
+
+.fill-list-button {
+    float: left;
+    border: 1px solid black;
+    font-size: 14px;
+    padding: 0 5px;
+    cursor: pointer;
+    background-color: #ddd;
+    margin-top: 5px;
+}
+.fill-list-button:hover {
+    background-color: #bbb;
+}
+
+.fill-sec-checkboxes {
+    font-size: 12px;
+    margin-left: 15px;
+    display: inline-block;
+
+    label {
+        position: relative;
+        left: 3px;
+        top: -2px;
+    }
 }

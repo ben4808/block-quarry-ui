@@ -1,27 +1,32 @@
-import React from 'react';
-import './EntryComp.css';
+import './EntryComp.scss';
 import { EntryCompProps } from './EntryCompProps';
 
 function EntryComp(props: EntryCompProps) {
-    function getScoreColor(score: number): string {
-        let indianRed = [0xcd, 0x5c, 0x5c];
-        let mediumGreen = [0x3c, 0xb3, 0x71];
-        let gray = [0x80, 0x80, 0x80];
+    function getScoreColor(score: number, lightColor: boolean): string {
+        let lightGray = [0xee, 0xee, 0xee];
+        let lightRed = [0xfc, 0xbf, 0xc3];
+        let lightGreen = [0xbd, 0xf0, 0xd2];
 
-        if (score < 1) return "#C80815";
+        let darkGray = [0x80, 0x80, 0x80];
+        let darkRed = [0xc8, 0x08, 0x15];
+        let darkGreen = [0x27, 0xae, 0x60];
+
+        let gray = lightColor ? lightGray : darkGray;
+        let red = lightColor ? lightRed : darkRed;
+        let green = lightColor ? lightGreen : darkGreen;
 
         let ret = "#";
         if (score <= 3) {
-            let pct = (score - 1) / 2;
+            let pct = Math.max(0, (score - 1) / 2);
             for (let i = 0; i < 3; i++) {
-                let val = Math.floor(((1 - pct) * indianRed[i] + pct * gray[i])/2);
+                let val = Math.floor((1 - pct) * red[i] + pct * gray[i]);
                 ret += val.toString(16).padStart(2, '0');
             }
         }
         if (score > 3) {
             let pct = (score - 3) / 2;
             for (let i = 0; i < 3; i++) {
-                let val = Math.floor(((1 - pct) * gray[i] + pct * mediumGreen[i])/2);
+                let val = Math.floor((1 - pct) * gray[i] + pct * green[i]);
                 ret += val.toString(16).padStart(2, '0');
             }
         }
@@ -32,17 +37,20 @@ function EntryComp(props: EntryCompProps) {
     let entry = props.entry;
 
     return (
-        <div key={entry.entry} data-entrykey={entry.entry} className={"entry" + 
-        (entry.isModified ? " entry-modified" : "") +
-        (entry.isSelected ? " entry-selected" : "")} 
-        style={{
-            color: entry.isExplored ? getScoreColor(entry.qualityScore!) : undefined,
-            borderColor: entry.isExplored ? getScoreColor(entry.obscurityScore!) : undefined,
-        }}>
-        {entry.displayText}
-        {entry.dataSourceScore &&
-            <div className="entry-data-score">{entry.dataSourceScore}</div>
-        }
+        <div data-entrykey={entry.entry}>
+            <div key={entry.entry} className={"entry" + 
+                (entry.isModified ? " entry-modified" : "") +
+                (entry.isSelected ? " entry-selected" : "")} 
+                style={{
+                    backgroundColor: entry.isExplored ? getScoreColor(entry.qualityScore!, true) : undefined,
+                    borderColor: entry.isExplored ? getScoreColor(entry.obscurityScore!, false) : undefined,
+                    borderWidth: entry.isExplored ? 1.5 : undefined,
+                }}>
+                {entry.displayText}
+                {entry.dataSourceScore &&
+                    <div className="entry-data-score">{entry.dataSourceScore}</div>
+                }
+            </div>
         </div>
     );
 };

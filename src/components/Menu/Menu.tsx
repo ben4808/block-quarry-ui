@@ -1,14 +1,13 @@
-import React from 'react';
 import "./Menu.scss";
 import { MenuProps } from './MenuProps';
 
 function Menu(props: MenuProps) {
     function checkForEnter(event: any) {
-        let key: string = event.key.toUpperCase();
+        let key: string = event.key;
 
         if (key === "Enter") {
             let query = event.target.value as string;
-            query = query.toUpperCase().replaceAll(/[^A-Z\.]/, "");
+            query = query.toUpperCase().replaceAll(/[^A-Z.]/g, "");
             if (query.length === 0) return;
 
             props.onNewQuery(query);
