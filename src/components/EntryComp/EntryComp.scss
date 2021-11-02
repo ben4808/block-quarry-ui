@@ -5,4 +5,25 @@
     padding: 0 5px;
     font-size: 14px;
     margin: 1px 0;
+
+    &:hover {
+        background-color: #bbb;
+    }
+}
+
+.entry-modified-bar {
+    display: inline-block;
+    width: 3px;
+    margin: 0 3px;
+}
+
+.entry-data-score {
+    width: 25px;
+    float: right;
+    font-size: 14px;
+}
+
+.entry-selected {
+    background-color: lightblue;
+    border: 1px solid darkblue;
 }

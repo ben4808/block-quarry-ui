@@ -37,11 +37,12 @@ function EntryComp(props: EntryCompProps) {
     let entry = props.entry;
 
     return (
-        <div data-entrykey={entry.entry}>
-            <div key={entry.entry} className={"entry" + 
-                (entry.isModified ? " entry-modified" : "") +
-                (entry.isSelected ? " entry-selected" : "")} 
-                style={{
+        <div data-entrykey={entry.entry} className={"entry" + 
+            (entry.isSelected ? " entry-selected" : "")}>
+            <div className="entry-modified-bar"
+                style={{backgroundColor: entry.isModified ? "green" : "transparent"}}>
+            </div>
+            <div style={{
                     backgroundColor: entry.isExplored ? getScoreColor(entry.qualityScore!, true) : undefined,
                     borderColor: entry.isExplored ? getScoreColor(entry.obscurityScore!, false) : undefined,
                     borderWidth: entry.isExplored ? 1.5 : undefined,
