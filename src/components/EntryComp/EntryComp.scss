@@ -27,3 +27,20 @@
     background-color: lightblue;
     border: 1px solid darkblue;
 }
+
+.frontier-entry {
+    display: inline-block;
+}
+
+.views-100 {
+    background-color: #fcbfc3;
+}
+.views-25 {
+    background-color: lighten(#fcbfc3, 20%);
+}
+.views-5 {
+    background-color: lighten(#fcbfc3, 40%);
+}
+.views-1 {
+    background-color: lighten(#fcbfc3, 60%);
+}

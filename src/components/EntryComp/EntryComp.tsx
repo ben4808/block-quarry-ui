@@ -38,6 +38,13 @@ function EntryComp(props: EntryCompProps) {
 
     return (
         <div data-entrykey={entry.entry} className={"entry" + 
+            (props.isFrontier ? "frontier-entry" : "") +
+            (props.isFrontier ? (
+                props.entry.views! > 100 ? "views-100 " :
+                props.entry.views! > 25 ? "views-25 " :
+                props.entry.views! > 5 ? "views-5" :
+                props.entry.views! > 0 ? "views-1" : ""
+            ) : "") +
             (entry.isSelected ? " entry-selected" : "")}>
             <div className="entry-modified-bar"
                 style={{backgroundColor: entry.isModified ? "green" : "transparent"}}>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { discoveredQuery } from '../../api/api';
-import { deepClone, getDictScoreForEntry, mapKeys, mapValues } from '../../lib/utils';
+import { deepClone, getDictScoreForEntry, mapKeys, mapValues, updateEntriesWithKeyPress } from '../../lib/utils';
 import { Entry } from '../../models/Entry';
 import EntryComp from '../EntryComp/EntryComp';
 import './Explored.scss';
@@ -91,56 +91,20 @@ function Explored(props: ExploredProps) {
         let selectedEntries = mapValues(newEntries).filter(x => x.isSelected);
         if (selectedEntries.length === 0) return;
 
-        if (key === "W") {
-            for (let entry of selectedEntries)
-                entry.qualityScore = 5;
-        }
-        if (key === "A") {
-            for (let entry of selectedEntries)
-                entry.qualityScore = 2;
-        }
-        if (key === "S") {
-            for (let entry of selectedEntries)
-                entry.qualityScore = 3;
-        }
-        if (key === "D") {
-            for (let entry of selectedEntries)
-                entry.qualityScore = 4;
-        }
-        if (key === "Z") {
-            for (let entry of selectedEntries)
-                entry.qualityScore = 1;
-        }
-        if (key === "X") {
-            for (let entry of selectedEntries)
-                entry.qualityScore = 0;
-        }
-        if (key === "0") {
-            for (let entry of selectedEntries)
-                entry.obscurityScore = 0;
-        }
-        if (key === "1") {
-            for (let entry of selectedEntries)
-                entry.obscurityScore = 1;
-        }
-        if (key === "2") {
-            for (let entry of selectedEntries)
-                entry.obscurityScore = 2;
-        }
-        if (key === "3") {
-            for (let entry of selectedEntries)
-                entry.obscurityScore = 3;
-        }
-        if (key === "4") {
-            for (let entry of selectedEntries)
-                entry.obscurityScore = 4;
-        }
-        if (key === "5") {
-            for (let entry of selectedEntries)
-                entry.obscurityScore = 5;
+        updateEntriesWithKeyPress(selectedEntries, key);
+
+        if (selectedEntries.length === 1 && key === 'R') {
+            let newText = prompt("Enter new display text:");
+            if (!newText) return;
+            let normalized = newText.replaceAll(/[^A-Za-z]/g, "");
+            if (normalized.toLowerCase() !== selectedEntries[0].entry) return;
+            selectedEntries[0].displayText = newText;
         }
 
         setEntries(newEntries);
+        for (let entry of selectedEntries) {
+            props.entryChanged(entry);
+        }
     }
 
     function handleOnlyChangesToggle() {
@@ -164,6 +128,26 @@ function Explored(props: ExploredProps) {
         window.open()!.document.write(`<pre>${lines.join("\n")}</pre>`);
     }
 
+    function addNewEntry(event: any) {
+        let key: string = event.key.toUpperCase();
+
+        let newText = (document.getElementById("new-entry") as HTMLInputElement)!.value;
+        if (key === "Enter") {
+            let normalized = newText.replaceAll(/[^A-Za-z]/g, "");
+            let newEntry = {
+                entry: normalized.toUpperCase(),
+                displayText: newText,
+                qualityScore: 3,
+                obscurityScore: 3,
+            } as Entry;
+
+            let newEntries = deepClone(entries) as Map<string, Entry>;
+            newEntries.set(normalized, newEntry);
+            setEntries(newEntries);
+            props.entryChanged(newEntry);
+        }
+    }
+
     return (
         <div id="Explored">
             <div id="topbar">
@@ -178,12 +162,15 @@ function Explored(props: ExploredProps) {
                     <label htmlFor="onlySelected">Only Selected</label>
                 </div>
             </div>
+            <div id="topbar2">
+                <input type="text" id="new-entry" placeholder="Add Entry..." onKeyDown={addNewEntry}></input>
+            </div>
             <div onKeyDown={handleKeyDown} onClick={handleEntryClick} tabIndex={0}>
                 {isLoading &&
                     <div>Loading...</div>
                 }
                 {entryArray.map(entry => (
-                    <EntryComp key={entry.entry} entry={entry}></EntryComp>
+                    <EntryComp isFrontier={false} key={entry.entry} entry={entry}></EntryComp>
                 ))}
             </div>
         </div>
