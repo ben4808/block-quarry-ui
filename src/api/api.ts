@@ -1,6 +1,6 @@
 import { Entry } from "../models/Entry";
 
-const baseUrl = "http://localhost:3001";
+const baseUrl = "http://localhost:3001/api";
 
 export async function discoveredQuery(query: string): Promise<Entry[]> {
     try {
@@ -33,13 +33,15 @@ export async function frontierQuery(query: string, dataSource: string, page?: nu
 
 export async function discoverEntries(username: string, entries: Entry[]): Promise<void> {
     try {
-        let url = `${baseUrl}/discoverEntries`;
-        let response = await fetch(url, {
-            method: 'post',
-            body: JSON.stringify(entries),
-        });
+        console.log("Discover Entries...");
 
-        await response.json();
+        // let url = `${baseUrl}/discoverEntries`;
+        // let response = await fetch(url, {
+        //     method: 'post',
+        //     body: JSON.stringify(entries),
+        // });
+
+        // await response.json();
     }
     catch (e: any) {
         console.log("Error calling frontierQuery: " + e.message);

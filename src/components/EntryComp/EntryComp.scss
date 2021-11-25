@@ -1,33 +1,13 @@
 .entry {
     border-style: solid;
+    border-width: 2px;
     display: inline-block;
     border-radius: 5px;
     padding: 0 5px;
     font-size: 14px;
-    margin: 1px 0;
-
-    &:hover {
-        background-color: #bbb;
-    }
+    position: relative;
+    top: -4px;
 }
-
-.entry-modified-bar {
-    display: inline-block;
-    width: 3px;
-    margin: 0 3px;
-}
-
-.entry-data-score {
-    width: 25px;
-    float: right;
-    font-size: 14px;
-}
-
-.entry-selected {
-    background-color: lightblue;
-    border: 1px solid darkblue;
-}
-
 .frontier-entry {
     display: inline-block;
 }
@@ -43,4 +23,36 @@
 }
 .views-1 {
     background-color: lighten(#fcbfc3, 60%);
+}
+
+.modified-bar {
+    display: inline-block;
+    width: 5px;
+    margin: 0 5px;
+    height: 23px;
+    position: relative;
+    top: 2px;
+}
+.modified-bar-green {
+    background-color: mediumseagreen;
+}
+
+.entry-shell {
+    display: block;
+    height: 27px;
+
+    &:hover {
+        cursor: pointer;
+        background-color: #ddd;
+    }
+}
+.entry-shell-frontier {
+    display: inline-block;
+}
+.entry-shell-selected {
+    background-color: lightblue;
+
+    &:hover {
+        background-color: lightblue;
+    }
 }

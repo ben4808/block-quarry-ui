@@ -4,21 +4,24 @@
     font-family: Verdana, sans-serif;
     border-right: 2px solid #ccc;
     width: 300px;
-    min-height: 725px;
+    height: 750px;
     overflow-y: scroll;
+    vertical-align: top;
+    border-bottom: 2px solid #ccc;
 }
 
 #topbar {
     background-color: #eee;
-    padding: 5px 0 0 15px;
+    padding: 5px 0 2px 15px;
 }
 
 #topbar2 {
     background-color: #eee;
-    padding: 5px 0 0 15px;
+    padding: 0 0 10px 15px;
 
     input {
-        width: 150px;
+        width: 200px;
+        font-size: 12px;
     }
 }
 

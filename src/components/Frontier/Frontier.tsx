@@ -30,6 +30,10 @@ function Frontier(props: FrontierProps) {
         setPage(page + 1);
     }
 
+    function resetPage() {
+        setPage(1);
+    }
+
     function decrementPage() {
         if (page <= 0)
             return;
@@ -69,17 +73,18 @@ function Frontier(props: FrontierProps) {
     return (
         <div id="Frontier">
             <div id="topbar">
-                <label htmlFor="data-source-select">Data Source</label>
-                <select id="data-source-select">
+                <label id="data-source-label" htmlFor="data-source-select">Data Source</label>
+                <select id="data-source-select" defaultValue="Podcasts">
                     <option value="Ginsberg">Ginsberg clues</option>
-                    <option value="Podcasts" selected>Podcast database</option>
+                    <option value="Podcasts">Podcast database</option>
                 </select>
-                <div className="fill-list-button" onClick={loadData}>Load</div>
+                <div className="frontier-button" onClick={loadData}>Load</div>
 
                 <label id="page-label">Page</label>
-                <div className="fill-list-button" onClick={decrementPage}>&lt;</div>
+                <div className="frontier-button" onClick={resetPage}>|&lt;</div>
+                <div className="frontier-button" onClick={decrementPage}>&lt;</div>
                 <label id="page">{page}</label>
-                <div className="fill-list-button" onClick={incrementPage}>&gt;</div>
+                <div className="frontier-button" onClick={incrementPage}>&gt;</div>
             </div>
             <div onKeyDown={handleKeyDown} onClick={handleEntryClick} tabIndex={0}>
                 {isLoading &&

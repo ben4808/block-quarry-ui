@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { discoveredQuery } from '../../api/api';
 import { deepClone, getDictScoreForEntry, mapKeys, mapValues, updateEntriesWithKeyPress } from '../../lib/utils';
 import { Entry } from '../../models/Entry';
@@ -13,98 +13,150 @@ function Explored(props: ExploredProps) {
     const [exportOnlyChanges, setExportOnlyChanges] = useState(true);
     const [exportOnlySelected, setExportOnlySelected] = useState(false);
 
-    let entryArray = generateEntryArray();
+    const entryArray = useRef([] as Entry[]);
 
     useEffect(() => {
         async function doDiscoveredQuery() {
+            if (props.query.length === 0) return;
+
             setIsLoading(true);
             let results = await discoveredQuery(props.query);
             let newEntries = new Map<string, Entry>();
             for (let result of results) {
+                result.isExplored = true;
                 newEntries.set(result.entry, result);
             }
             setEntries(newEntries);
+            generateEntryArray(newEntries);
             setIsLoading(false);
         }
 
         doDiscoveredQuery();
     }, [props.query]);
 
-    function generateEntryArray(): Entry[] {
+    function generateEntryArray(newEntries: Map<string, Entry>) {
         let ret = [] as Entry[];
-        if (entries.size === 0) return ret;
+        if (newEntries.size === 0) return ret;
 
         let scoreDict = new Map<string, number>();
-        for (let key of mapKeys(entries)) {
-            let entry = entries.get(key)!;
+        for (let key of mapKeys(newEntries)) {
+            let entry = newEntries.get(key)!;
             scoreDict.set(entry.entry, getDictScoreForEntry(entry));
         }
 
         let sorted = mapKeys(scoreDict).sort((a, b) => scoreDict.get(b)! - scoreDict.get(a)!);
         for (let key of sorted) {
-            ret.push(entries.get(key)!);
+            ret.push(newEntries.get(key)!);
         }
 
-        return ret;
+        entryArray.current = ret;
     }
 
     function handleEntryClick(event: any) {
         let target = event.target;
-        while (target.classList.length < 1 || target.classList[0] !== "entry") {
+        while (target.classList.length < 1 || target.classList[0] !== "entry-shell") {
             target = target.parentElement;
             if (!target) return;
         }
 
-        if (entryArray.length === 0) return;
+        if (entryArray.current.length === 0) return;
 
         let targetEntry = entries.get(target.dataset["entrykey"])!;
-        let newEntries = deepClone(entries) as Map<string, Entry>;
-
+        let newEntries = [] as Entry[];
         if (lastSelectedKey && event.shiftKey) {
-            let lastSelectedIndex = entryArray.findIndex(x => x.entry === lastSelectedKey);
-            let targetIndex = entryArray.findIndex(x => x.entry === targetEntry.entry);
+            let lastSelectedIndex = entryArray.current.findIndex(x => x.entry === lastSelectedKey);
+            let targetIndex = entryArray.current.findIndex(x => x.entry === targetEntry.entry);
             let minIndex = Math.min(lastSelectedIndex, targetIndex);
             let maxIndex = Math.max(lastSelectedIndex, targetIndex);
             for (let i = minIndex; i <= maxIndex; i++ ) {
-                let key = entryArray[i].entry;
-                newEntries.get(key)!.isSelected = true;
+                let entry = entries.get(entryArray.current[i].entry)!;
+                if (!entry.isSelected) {
+                    entry.isSelected = true;
+                    newEntries.push(entry);
+                }
             }
         }
-        else if (!event.ctrlKey) {
-            for (let i = 0; i < entryArray.length; i++) {
-                newEntries.get(entryArray[i].entry)!.isSelected = false;
+        else { 
+            if (!event.ctrlKey) {
+                for (let i = 0; i < entryArray.current.length; i++) {
+                    let entry = entries.get(entryArray.current[i].entry)!;
+                    if (entry.isSelected) {
+                        entry.isSelected = false;
+                        newEntries.push(entry);
+                    }
+                }
             }
-        }
-        else {
-            newEntries.get(targetEntry.entry)!.isSelected = !newEntries.get(targetEntry.entry)!.isSelected;
+
+            targetEntry.isSelected = !targetEntry.isSelected;
+            newEntries.push(targetEntry);
             setLastSelectedKey(targetEntry.entry);
         }
         
-        setEntries(newEntries);
+        updateEntries(newEntries);
+    }
+
+    function handleDeselect(event: any) {
+        let target = event.target;
+        while (true) {
+            if (!target) break;
+            if (target.classList[0] === "entry-shell") return;
+            target = target.parentElement;
+        }
+
+        let newEntries = [] as Entry[];
+        mapValues(entries).forEach(entry => {
+            if (entry.isSelected) {
+                entry.isSelected = false;
+                newEntries.push(entry);
+            }
+        });
+
+        updateEntries(newEntries);
+    }
+
+    function updateEntries(newEntries: Entry[]) {
+        let newEntriesMap = deepClone(entries) as Map<string, Entry>;
+
+        for (let entry of newEntries) {
+            let existingEntry = newEntriesMap.get(entry.entry);
+            if (existingEntry?.isModified) entry.isModified = true;
+            if (!existingEntry || wasEntryModified(existingEntry, entry)) {
+                entry.isModified = true;
+                props.entryChanged(entry);
+            }
+
+            newEntriesMap.set(entry.entry, entry);
+        }
+
+        setEntries(newEntriesMap);
+        generateEntryArray(newEntriesMap);
+    }
+
+    function wasEntryModified(oldEntry: Entry, newEntry: Entry): boolean {
+        return (
+            oldEntry.displayText !== newEntry.displayText ||
+            oldEntry.qualityScore !== newEntry.qualityScore ||
+            oldEntry.obscurityScore !== newEntry.obscurityScore
+        );
     }
 
     function handleKeyDown(event: any) {
         let key: string = event.key.toUpperCase();
 
-        let newEntries = deepClone(entries) as Map<string, Entry>;
-
-        let selectedEntries = mapValues(newEntries).filter(x => x.isSelected);
+        let selectedEntries = deepClone(mapValues(entries).filter(x => x.isSelected));
         if (selectedEntries.length === 0) return;
 
         updateEntriesWithKeyPress(selectedEntries, key);
 
         if (selectedEntries.length === 1 && key === 'R') {
-            let newText = prompt("Enter new display text:");
+            let newText = prompt("Enter new display text:", selectedEntries[0].displayText);
             if (!newText) return;
             let normalized = newText.replaceAll(/[^A-Za-z]/g, "");
-            if (normalized.toLowerCase() !== selectedEntries[0].entry) return;
+            if (normalized.toUpperCase() !== selectedEntries[0].entry) return;
             selectedEntries[0].displayText = newText;
         }
 
-        setEntries(newEntries);
-        for (let entry of selectedEntries) {
-            props.entryChanged(entry);
-        }
+        updateEntries(selectedEntries);
     }
 
     function handleOnlyChangesToggle() {
@@ -118,7 +170,7 @@ function Explored(props: ExploredProps) {
     function exportEntries() {
         let lines = [] as string[];
 
-        entryArray.forEach(entry => {
+        entryArray.current.forEach(entry => {
             if (exportOnlyChanges && !entry.isModified) return;
             if (exportOnlySelected && !entry.isSelected) return;
 
@@ -129,27 +181,26 @@ function Explored(props: ExploredProps) {
     }
 
     function addNewEntry(event: any) {
-        let key: string = event.key.toUpperCase();
+        let key: string = event.key;
+        let textbox = (document.getElementById("new-entry") as HTMLInputElement);
 
-        let newText = (document.getElementById("new-entry") as HTMLInputElement)!.value;
+        let newText = textbox!.value;
         if (key === "Enter") {
-            let normalized = newText.replaceAll(/[^A-Za-z]/g, "");
+            let normalized = newText.replaceAll(/[^A-Za-z]/g, "").toUpperCase();
             let newEntry = {
-                entry: normalized.toUpperCase(),
+                entry: normalized,
                 displayText: newText,
                 qualityScore: 3,
                 obscurityScore: 3,
             } as Entry;
 
-            let newEntries = deepClone(entries) as Map<string, Entry>;
-            newEntries.set(normalized, newEntry);
-            setEntries(newEntries);
-            props.entryChanged(newEntry);
+            updateEntries([newEntry]);
+            textbox.value = "";
         }
     }
 
     return (
-        <div id="Explored">
+        <div id="Explored" onClick={handleDeselect}>
             <div id="topbar">
                 <div className="fill-list-button" onClick={exportEntries}>Export</div>
                 <div className="fill-sec-checkboxes">
@@ -169,7 +220,7 @@ function Explored(props: ExploredProps) {
                 {isLoading &&
                     <div>Loading...</div>
                 }
-                {entryArray.map(entry => (
+                {!isLoading && entryArray.current.map(entry => (
                     <EntryComp isFrontier={false} key={entry.entry} entry={entry}></EntryComp>
                 ))}
             </div>
