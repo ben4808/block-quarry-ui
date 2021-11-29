@@ -1,6 +1,7 @@
 .entry {
     border-style: solid;
     border-width: 2px;
+    border-color: #eee;
     display: inline-block;
     border-radius: 5px;
     padding: 0 5px;
@@ -13,16 +14,16 @@
 }
 
 .views-100 {
-    background-color: #fcbfc3;
+    background-color: #fba7ac;
 }
 .views-25 {
-    background-color: lighten(#fcbfc3, 20%);
+    background-color: lighten(#fba7ac, 5%);
 }
 .views-5 {
-    background-color: lighten(#fcbfc3, 40%);
+    background-color: lighten(#fba7ac, 10%);
 }
 .views-1 {
-    background-color: lighten(#fcbfc3, 60%);
+    background-color: lighten(#fba7ac, 15%);
 }
 
 .modified-bar {
@@ -43,11 +44,13 @@
 
     &:hover {
         cursor: pointer;
-        background-color: #ddd;
+        background-color: #eee;
     }
 }
 .entry-shell-frontier {
     display: inline-block;
+    padding: 5px;
+    height: 30px;
 }
 .entry-shell-selected {
     background-color: lightblue;

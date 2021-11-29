@@ -7,13 +7,14 @@ import './Explored.scss';
 import { ExploredProps } from './ExploredProps';
 
 function Explored(props: ExploredProps) {
-    const [entries, setEntries] = useState(new Map<string, Entry>());
     const [lastSelectedKey, setLastSelectedKey] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [exportOnlyChanges, setExportOnlyChanges] = useState(true);
     const [exportOnlySelected, setExportOnlySelected] = useState(false);
+    const [updateSemaphore, setUpdateSemaphore] = useState(0);
 
     const entryArray = useRef([] as Entry[]);
+    const entryArrayMap = useRef(new Map<string, boolean>());
 
     useEffect(() => {
         async function doDiscoveredQuery() {
@@ -26,30 +27,45 @@ function Explored(props: ExploredProps) {
                 result.isExplored = true;
                 newEntries.set(result.entry, result);
             }
-            setEntries(newEntries);
+            props.entriesModified(mapValues(newEntries), true);
             generateEntryArray(newEntries);
             setIsLoading(false);
         }
 
         doDiscoveredQuery();
+        // eslint-disable-next-line
     }, [props.query]);
 
+    useEffect(() => {
+        for (let entry of mapValues(props.exploredEntries)) {
+            if (!entryArrayMap.current.has(entry.entry)) {
+                entryArray.current.unshift(entry);
+                entryArrayMap.current.set(entry.entry, true);
+            }
+        }
+
+        setUpdateSemaphore(updateSemaphore + 1);
+        // eslint-disable-next-line
+    }, [props.exploredEntries]);
+
     function generateEntryArray(newEntries: Map<string, Entry>) {
-        let ret = [] as Entry[];
-        if (newEntries.size === 0) return ret;
+        let newArray = [] as Entry[];
+        let newArrayMap = new Map<string, boolean>();
+        if (newEntries.size === 0) return newArray;
 
         let scoreDict = new Map<string, number>();
-        for (let key of mapKeys(newEntries)) {
-            let entry = newEntries.get(key)!;
+        for (let entry of mapValues(newEntries)) {
             scoreDict.set(entry.entry, getDictScoreForEntry(entry));
         }
 
         let sorted = mapKeys(scoreDict).sort((a, b) => scoreDict.get(b)! - scoreDict.get(a)!);
         for (let key of sorted) {
-            ret.push(newEntries.get(key)!);
+            newArray.push(newEntries.get(key)!);
+            newArrayMap.set(key, true);
         }
 
-        entryArray.current = ret;
+        entryArray.current = newArray;
+        entryArrayMap.current = newArrayMap;
     }
 
     function handleEntryClick(event: any) {
@@ -61,7 +77,7 @@ function Explored(props: ExploredProps) {
 
         if (entryArray.current.length === 0) return;
 
-        let targetEntry = entries.get(target.dataset["entrykey"])!;
+        let targetEntry = props.exploredEntries.get(target.dataset["entrykey"])!;
         let newEntries = [] as Entry[];
         if (lastSelectedKey && event.shiftKey) {
             let lastSelectedIndex = entryArray.current.findIndex(x => x.entry === lastSelectedKey);
@@ -69,7 +85,7 @@ function Explored(props: ExploredProps) {
             let minIndex = Math.min(lastSelectedIndex, targetIndex);
             let maxIndex = Math.max(lastSelectedIndex, targetIndex);
             for (let i = minIndex; i <= maxIndex; i++ ) {
-                let entry = entries.get(entryArray.current[i].entry)!;
+                let entry = props.exploredEntries.get(entryArray.current[i].entry)!;
                 if (!entry.isSelected) {
                     entry.isSelected = true;
                     newEntries.push(entry);
@@ -79,7 +95,7 @@ function Explored(props: ExploredProps) {
         else { 
             if (!event.ctrlKey) {
                 for (let i = 0; i < entryArray.current.length; i++) {
-                    let entry = entries.get(entryArray.current[i].entry)!;
+                    let entry = props.exploredEntries.get(entryArray.current[i].entry)!;
                     if (entry.isSelected) {
                         entry.isSelected = false;
                         newEntries.push(entry);
@@ -92,7 +108,7 @@ function Explored(props: ExploredProps) {
             setLastSelectedKey(targetEntry.entry);
         }
         
-        updateEntries(newEntries);
+        props.entriesModified(newEntries);
     }
 
     function handleDeselect(event: any) {
@@ -104,46 +120,20 @@ function Explored(props: ExploredProps) {
         }
 
         let newEntries = [] as Entry[];
-        mapValues(entries).forEach(entry => {
+        mapValues(props.exploredEntries).forEach(entry => {
             if (entry.isSelected) {
                 entry.isSelected = false;
                 newEntries.push(entry);
             }
         });
 
-        updateEntries(newEntries);
-    }
-
-    function updateEntries(newEntries: Entry[]) {
-        let newEntriesMap = deepClone(entries) as Map<string, Entry>;
-
-        for (let entry of newEntries) {
-            let existingEntry = newEntriesMap.get(entry.entry);
-            if (existingEntry?.isModified) entry.isModified = true;
-            if (!existingEntry || wasEntryModified(existingEntry, entry)) {
-                entry.isModified = true;
-                props.entryChanged(entry);
-            }
-
-            newEntriesMap.set(entry.entry, entry);
-        }
-
-        setEntries(newEntriesMap);
-        generateEntryArray(newEntriesMap);
-    }
-
-    function wasEntryModified(oldEntry: Entry, newEntry: Entry): boolean {
-        return (
-            oldEntry.displayText !== newEntry.displayText ||
-            oldEntry.qualityScore !== newEntry.qualityScore ||
-            oldEntry.obscurityScore !== newEntry.obscurityScore
-        );
+        props.entriesModified(newEntries);
     }
 
     function handleKeyDown(event: any) {
         let key: string = event.key.toUpperCase();
 
-        let selectedEntries = deepClone(mapValues(entries).filter(x => x.isSelected));
+        let selectedEntries = deepClone(mapValues(props.exploredEntries).filter(x => x.isSelected));
         if (selectedEntries.length === 0) return;
 
         updateEntriesWithKeyPress(selectedEntries, key);
@@ -156,7 +146,7 @@ function Explored(props: ExploredProps) {
             selectedEntries[0].displayText = newText;
         }
 
-        updateEntries(selectedEntries);
+        props.entriesModified(selectedEntries);
     }
 
     function handleOnlyChangesToggle() {
@@ -187,14 +177,28 @@ function Explored(props: ExploredProps) {
         let newText = textbox!.value;
         if (key === "Enter") {
             let normalized = newText.replaceAll(/[^A-Za-z]/g, "").toUpperCase();
+            let newEntries = [] as Entry[];
             let newEntry = {
                 entry: normalized,
                 displayText: newText,
                 qualityScore: 3,
                 obscurityScore: 3,
+                isSelected: true,
+                isExplored: true,
+                isModified: true,
             } as Entry;
 
-            updateEntries([newEntry]);
+            newEntries.push(newEntry);
+            mapValues(props.exploredEntries).forEach(entry => {
+                if (entry.isSelected) {
+                    entry.isSelected = false;
+                    newEntries.push(entry);
+                }
+            });
+
+            entryArray.current.unshift(newEntry);
+            entryArrayMap.current.set(newEntry.entry, true);
+            props.entriesModified(newEntries);
             textbox.value = "";
         }
     }

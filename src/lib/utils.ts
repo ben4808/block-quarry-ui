@@ -50,6 +50,12 @@ export function getDictScoreForEntry(entry: Entry): number {
 }
 
 export function updateEntriesWithKeyPress(selectedEntries: Entry[], key: string) {
+    for (let entry of selectedEntries) {
+        entry.isExplored = true;
+        if (!entry.qualityScore) entry.qualityScore = 3;
+        if (!entry.obscurityScore) entry.obscurityScore = 3;
+    }
+            
     if (key === "W") {
         for (let entry of selectedEntries)
             entry.qualityScore = 5;

@@ -8,7 +8,7 @@ import "./Frontier.scss";
 import { FrontierProps } from './FrontierProps';
 
 function Frontier(props: FrontierProps) {
-    const [entries, setEntries] = useState([] as Entry[]);
+    const [frontierEntries, setFrontierEntries] = useState([] as Entry[]);
     const [isLoading, setIsLoading] = useState(false);
     const [page, setPage] = useState(1);
 
@@ -18,56 +18,68 @@ function Frontier(props: FrontierProps) {
         setIsLoading(true);
         let dataSource = (document.getElementById("data-source-select") as HTMLSelectElement)!.value;
         let results = await frontierQuery(props.query, dataSource, page);
-        setEntries(results);
-        setPage(1);
+
+        for (let entry of results) {
+            if (props.exploredEntries.has(entry.entry)) {
+                let exploredEntry = props.exploredEntries.get(entry.entry)!;
+                entry.isExplored = true;
+                entry.qualityScore = exploredEntry.qualityScore;
+                entry.obscurityScore = exploredEntry.obscurityScore;
+            }
+        }
+
+        setFrontierEntries(results);
         setIsLoading(false);
     }
 
     function incrementPage() {
-        if (entries.length < results_per_page)
+        if (frontierEntries.length < results_per_page)
             return;
 
         setPage(page + 1);
+        setTimeout(() => { loadData(); }, 500);
     }
 
     function resetPage() {
         setPage(1);
+        setTimeout(() => { loadData(); }, 500);
     }
 
     function decrementPage() {
-        if (page <= 0)
+        if (page <= 1)
             return;
 
         setPage(page - 1);
+        setTimeout(() => { loadData(); }, 500);
     }
 
     function handleEntryClick(event: any) {
         let target = event.target;
-        while (target.classList.length < 1 || target.classList[0] !== "entry") {
+        while (target.classList.length < 1 || target.classList[0] !== "entry-shell") {
             target = target.parentElement;
             if (!target) return;
         }
         
-        let newEntries = deepClone(entries) as Entry[];
-        let targetEntry = newEntries.find(x => x.entry === target.dataset["entrykey"])!;
+        let newFrontierEntries = deepClone(frontierEntries) as Entry[];
+        let targetEntry = newFrontierEntries.find(x => x.entry === target.dataset["entrykey"])!;
 
-        for (let entry of newEntries) entry.isSelected = false;
+        for (let entry of newFrontierEntries) entry.isSelected = false;
         targetEntry.isSelected = true;
         
-        setEntries(newEntries);
+        setFrontierEntries(newFrontierEntries);
     }
 
     function handleKeyDown(event: any) {
         let key: string = event.key.toUpperCase();
 
-        let newEntries = deepClone(entries) as Entry[];
-
-        let selectedEntry = newEntries.find(x => x.isSelected);
+        let newFrontierEntries = deepClone(frontierEntries) as Entry[];
+        let selectedEntry = newFrontierEntries.find(x => x.isSelected);
         if (!selectedEntry) return;
 
+        selectedEntry.isSelected = false;
         updateEntriesWithKeyPress([selectedEntry], key);
-        setEntries(newEntries);
-        props.entryChanged(selectedEntry);
+        setFrontierEntries(newFrontierEntries);
+        props.entriesModified([selectedEntry]);
     }
 
     return (
@@ -90,7 +102,7 @@ function Frontier(props: FrontierProps) {
                 {isLoading &&
                     <div>Loading...</div>
                 }
-                {entries.map(entry => (
+                {!isLoading && frontierEntries.map(entry => (
                     <EntryComp isFrontier={true} key={entry.entry} entry={entry}></EntryComp>
                 ))}
             </div>

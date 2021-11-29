@@ -2,6 +2,7 @@ import { Entry } from "../../models/Entry";
 
 export interface ExploredProps {
     query: string;
+    exploredEntries: Map<string, Entry>;
 
-    entryChanged: (newEntry: Entry) => void;
+    entriesModified: (newEntries: Entry[], initialLoad?: boolean) => void;
 }
