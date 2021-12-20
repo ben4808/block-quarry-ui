@@ -4,5 +4,6 @@ export interface FrontierProps {
     query: string;
     exploredEntries: Map<string, Entry>;
 
-    entriesModified: (newEntries: Entry[], initialLoad?: boolean) => void;
+    entriesModified: (newEntries: Entry[]) => void;
+    updateExploredEntries: (newEntries: Map<string, Entry>) => void;
 }

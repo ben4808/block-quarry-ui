@@ -14,15 +14,12 @@
 }
 
 .views-100 {
-    background-color: #fba7ac;
-}
-.views-25 {
     background-color: lighten(#fba7ac, 5%);
 }
-.views-5 {
+.views-25 {
     background-color: lighten(#fba7ac, 10%);
 }
-.views-1 {
+.views-5 {
     background-color: lighten(#fba7ac, 15%);
 }
 
@@ -48,7 +45,6 @@
     }
 }
 .entry-shell-frontier {
-    display: inline-block;
     padding: 5px;
     height: 30px;
 }

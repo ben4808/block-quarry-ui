@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { frontierQuery } from '../../api/api';
-import { deepClone, updateEntriesWithKeyPress } from '../../lib/utils';
+import { calculateFrontierPriority, deepClone, mapValues, updateEntriesWithKeyPress } from '../../lib/utils';
 import { Entry } from '../../models/Entry';
 import EntryComp from '../EntryComp/EntryComp';
 import "../Explored/Explored.scss"
@@ -14,22 +14,47 @@ function Frontier(props: FrontierProps) {
 
     const results_per_page = 100;
 
+    useEffect(() => {
+        setFrontierEntries([] as Entry[]);
+        setIsLoading(false);
+        setPage(1);
+        // eslint-disable-next-line
+    }, [props.query]);
+
+    useEffect(() => {
+        let newFrontierEntries = deepClone(frontierEntries) as Entry[];
+        syncExploredEntries(newFrontierEntries);
+        // eslint-disable-next-line
+    }, [props.exploredEntries]);
+
     async function loadData() {
         setIsLoading(true);
         let dataSource = (document.getElementById("data-source-select") as HTMLSelectElement)!.value;
         let results = await frontierQuery(props.query, dataSource, page);
 
-        for (let entry of results) {
+        for (let result of results) {
+            result.frontierPriority = calculateFrontierPriority(result);
+        }
+        results = results.sort((a, b) => b.frontierPriority! - a.frontierPriority!);
+
+        syncExploredEntries(results);
+
+        setIsLoading(false);
+    }
+
+    function syncExploredEntries(newFrontierEntries: Entry[]) {
+        for (let entry of newFrontierEntries) {
+            entry.isSelected = false;
             if (props.exploredEntries.has(entry.entry)) {
                 let exploredEntry = props.exploredEntries.get(entry.entry)!;
                 entry.isExplored = true;
                 entry.qualityScore = exploredEntry.qualityScore;
                 entry.obscurityScore = exploredEntry.obscurityScore;
+                entry.isSelected = exploredEntry.isSelected;
             }
         }
 
-        setFrontierEntries(results);
-        setIsLoading(false);
+        setFrontierEntries(newFrontierEntries);
     }
 
     function incrementPage() {
@@ -60,12 +85,17 @@ function Frontier(props: FrontierProps) {
             if (!target) return;
         }
         
+        let newExploredEntries = deepClone(props.exploredEntries) as Map<string, Entry>;
         let newFrontierEntries = deepClone(frontierEntries) as Entry[];
         let targetEntry = newFrontierEntries.find(x => x.entry === target.dataset["entrykey"])!;
 
         for (let entry of newFrontierEntries) entry.isSelected = false;
+        for (let entry of mapValues(newExploredEntries)) entry.isSelected = false;
         targetEntry.isSelected = true;
+        if (newExploredEntries.has(targetEntry.entry))
+            newExploredEntries.get(targetEntry.entry)!.isSelected = true;
         
+        props.updateExploredEntries(newExploredEntries);
         setFrontierEntries(newFrontierEntries);
     }
 
@@ -82,6 +112,19 @@ function Frontier(props: FrontierProps) {
         props.entriesModified([selectedEntry]);
     }
 
+    let entryBatches = [] as Entry[][];
+    let i = 0;
+    let entriesPerBatch = 23;
+    while(i < frontierEntries.length) {
+        let newBatch = [] as Entry[];
+        for (let j = 0; j < entriesPerBatch; j++) {
+            if ((i+j) >= frontierEntries.length) break;
+            newBatch.push(frontierEntries[i+j]);
+        }
+        i += entriesPerBatch;
+        entryBatches.push(newBatch);
+    }
+
     return (
         <div id="Frontier">
             <div id="topbar">
@@ -89,6 +132,9 @@ function Frontier(props: FrontierProps) {
                 <select id="data-source-select" defaultValue="Podcasts">
                     <option value="Ginsberg">Ginsberg clues</option>
                     <option value="Podcasts">Podcast database</option>
+                    <option value="Nutrimatic">Nutrimatic</option>
+                    <option value="OneLook">OneLook</option>
+                    <option value="Newspapers">Newspapers</option>
                 </select>
                 <div className="frontier-button" onClick={loadData}>Load</div>
 
@@ -102,8 +148,12 @@ function Frontier(props: FrontierProps) {
                 {isLoading &&
                     <div>Loading...</div>
                 }
-                {!isLoading && frontierEntries.map(entry => (
-                    <EntryComp isFrontier={true} key={entry.entry} entry={entry}></EntryComp>
+                {!isLoading && entryBatches.map((batch, i) => (
+                    <div className="entry-batch" key={`batch${i}`}>
+                        {batch.map(entry => (
+                            <EntryComp isFrontier={true} key={entry.entry} entry={entry}></EntryComp>
+                        ))}
+                    </div>
                 ))}
             </div>
         </div>

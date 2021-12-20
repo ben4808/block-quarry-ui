@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Entry } from "../models/Entry";
 import { Cookies } from 'react-cookie';
+import { getEndingWordsToAvoid, getStartingWordsToAvoid } from "./wordsToAvoid";
 
 export const cookieKey = "block_quarry_user";
 
@@ -150,4 +151,26 @@ export function generateId(): string {
 
 export function getRandomInt(max: number) {
     return Math.floor(Math.random() * max);
+}
+
+export function calculateFrontierPriority(entry: Entry): number {
+    let words = entry.displayText.toLowerCase().split(" ").map(x => x.replaceAll(/[^a-z]/g, ""));
+
+    let startEndScore = 100;
+    let startingWordsToAvoid = getStartingWordsToAvoid();
+    if (startingWordsToAvoid.has(words[0]))
+        startEndScore = Math.min(startEndScore, startingWordsToAvoid.get(words[0])!);
+    let endingWordsToAvoid = getEndingWordsToAvoid();
+    if (endingWordsToAvoid.has(words[words.length - 1]))
+        startEndScore = Math.min(startEndScore, endingWordsToAvoid.get(words[words.length - 1])!);
+
+    let wordCountScore = Math.max(0, 110 - words.length*10);
+
+    let viewsScore = 100;
+    let views = entry.views || 0;
+    if (views >= 5) viewsScore = 66;
+    if (views >= 25) viewsScore = 33;
+    if (views >= 100) viewsScore = 0;
+
+    return (startEndScore + wordCountScore) * (viewsScore/100);
 }

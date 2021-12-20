@@ -45,14 +45,13 @@ function EntryComp(props: EntryCompProps) {
             <div className={"entry" + 
                 (props.isFrontier ? " frontier-entry" : "") +
                 (props.isFrontier ? (
-                    props.entry.views! > 100 ? " views-100" :
-                    props.entry.views! > 25 ? " views-25" :
-                    props.entry.views! > 5 ? " views-5" :
-                    props.entry.views! > 0 ? " views-1" : ""
+                    props.entry.views! >= 100 ? " views-100" :
+                    props.entry.views! >= 25 ? " views-25" :
+                    props.entry.views! >= 5 ? " views-5" : ""
                 ) : "") }
                 style={{
-                    backgroundColor: props.entry.isExplored ? getScoreColor(props.entry.qualityScore!, true) : undefined,
-                    borderColor: props.entry.isExplored ? getScoreColor(props.entry.obscurityScore!, false) : undefined,
+                    backgroundColor: props.entry.isExplored ? getScoreColor(props.entry.qualityScore!, true) : "white",
+                    borderColor: props.entry.isExplored ? getScoreColor(props.entry.obscurityScore!, false) : "#eee",
                 }}>
                 {props.entry.displayText}
             </div>

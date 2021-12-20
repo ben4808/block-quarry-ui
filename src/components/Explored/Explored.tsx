@@ -27,7 +27,7 @@ function Explored(props: ExploredProps) {
                 result.isExplored = true;
                 newEntries.set(result.entry, result);
             }
-            props.entriesModified(mapValues(newEntries), true);
+            props.updateExploredEntries(newEntries);
             generateEntryArray(newEntries);
             setIsLoading(false);
         }
@@ -42,6 +42,9 @@ function Explored(props: ExploredProps) {
                 entryArray.current.unshift(entry);
                 entryArrayMap.current.set(entry.entry, true);
             }
+            else {
+                generateEntryArray(props.exploredEntries);
+            }
         }
 
         setUpdateSemaphore(updateSemaphore + 1);
@@ -51,7 +54,6 @@ function Explored(props: ExploredProps) {
     function generateEntryArray(newEntries: Map<string, Entry>) {
         let newArray = [] as Entry[];
         let newArrayMap = new Map<string, boolean>();
-        if (newEntries.size === 0) return newArray;
 
         let scoreDict = new Map<string, number>();
         for (let entry of mapValues(newEntries)) {
@@ -77,38 +79,33 @@ function Explored(props: ExploredProps) {
 
         if (entryArray.current.length === 0) return;
 
-        let targetEntry = props.exploredEntries.get(target.dataset["entrykey"])!;
-        let newEntries = [] as Entry[];
+        let newEntriesMap = deepClone(props.exploredEntries) as Map<string, Entry>;
+        if (!event.ctrlKey) {
+            for (let entry of mapValues(newEntriesMap)) {
+                entry.isSelected = false;
+            }
+        }
+
+        let targetEntry = newEntriesMap.get(target.dataset["entrykey"])!;
         if (lastSelectedKey && event.shiftKey) {
             let lastSelectedIndex = entryArray.current.findIndex(x => x.entry === lastSelectedKey);
             let targetIndex = entryArray.current.findIndex(x => x.entry === targetEntry.entry);
             let minIndex = Math.min(lastSelectedIndex, targetIndex);
             let maxIndex = Math.max(lastSelectedIndex, targetIndex);
             for (let i = minIndex; i <= maxIndex; i++ ) {
-                let entry = props.exploredEntries.get(entryArray.current[i].entry)!;
+                let entry = newEntriesMap.get(entryArray.current[i].entry)!;
                 if (!entry.isSelected) {
                     entry.isSelected = true;
-                    newEntries.push(entry);
                 }
             }
         }
         else { 
-            if (!event.ctrlKey) {
-                for (let i = 0; i < entryArray.current.length; i++) {
-                    let entry = props.exploredEntries.get(entryArray.current[i].entry)!;
-                    if (entry.isSelected) {
-                        entry.isSelected = false;
-                        newEntries.push(entry);
-                    }
-                }
-            }
-
             targetEntry.isSelected = !targetEntry.isSelected;
-            newEntries.push(targetEntry);
             setLastSelectedKey(targetEntry.entry);
         }
         
-        props.entriesModified(newEntries);
+        props.updateExploredEntries(newEntriesMap);
+        generateEntryArray(newEntriesMap);
     }
 
     function handleDeselect(event: any) {
@@ -119,15 +116,13 @@ function Explored(props: ExploredProps) {
             target = target.parentElement;
         }
 
-        let newEntries = [] as Entry[];
-        mapValues(props.exploredEntries).forEach(entry => {
-            if (entry.isSelected) {
-                entry.isSelected = false;
-                newEntries.push(entry);
-            }
-        });
+        let newEntriesMap = deepClone(props.exploredEntries) as Map<string, Entry>;
+        for (let entry of mapValues(newEntriesMap)) {
+            entry.isSelected = false;
+        }
 
-        props.entriesModified(newEntries);
+        props.updateExploredEntries(newEntriesMap);
+        generateEntryArray(newEntriesMap);
     }
 
     function handleKeyDown(event: any) {
@@ -223,6 +218,9 @@ function Explored(props: ExploredProps) {
             <div onKeyDown={handleKeyDown} onClick={handleEntryClick} tabIndex={0}>
                 {isLoading &&
                     <div>Loading...</div>
+                }
+                {!isLoading && entryArray.current.length === 0 && 
+                    <i>No results</i>
                 }
                 {!isLoading && entryArray.current.map(entry => (
                     <EntryComp isFrontier={false} key={entry.entry} entry={entry}></EntryComp>

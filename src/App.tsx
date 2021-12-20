@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { discoverEntries } from './api/api';
 import './App.scss';
 import Explored from './components/Explored/Explored';
@@ -10,7 +10,7 @@ import { Entry } from './models/Entry';
 function App() {
     const [query, setQuery] = useState("");
     const [exploredEntries, setExploredEntries] = useState(new Map<string, Entry>());
-    let editBuffer = [] as Entry[];
+    let editBuffer = useRef([] as Entry[]);
 
     useEffect(() => {
         setUserId();
@@ -20,15 +20,19 @@ function App() {
         setQuery(query);
     }
 
-    function entriesModified(newEntries: Entry[], initialLoad?: boolean) {
+    function onUpdateExploredEntries(newEntries: Map<string, Entry>) {
+        setExploredEntries(newEntries);
+    }
+
+    function entriesModified(newEntries: Entry[]) {
         let newEntriesMap = deepClone(exploredEntries) as Map<string, Entry>;
 
         for (let entry of newEntries) {
             let existingEntry = newEntriesMap.get(entry.entry);
             if (existingEntry?.isModified) entry.isModified = true;
-            if (!initialLoad && (!existingEntry || wasEntryModified(existingEntry, entry))) {
+            if (!existingEntry || wasEntryModified(existingEntry, entry)) {
                 entry.isModified = true;
-                editBuffer.push(entry);
+                editBuffer.current.push(entry);
             }
 
             newEntriesMap.set(entry.entry, entry);
@@ -46,11 +50,11 @@ function App() {
     }
 
     async function sendEdits() {
-        if (editBuffer.length === 0) return;
+        if (editBuffer.current.length === 0) return;
 
         let userId = getUserId();
-        await discoverEntries(userId, editBuffer);
-        editBuffer = [];
+        await discoverEntries(userId, editBuffer.current);
+        editBuffer.current = [];
     }
 
     useInterval(sendEdits, 5000);
@@ -58,8 +62,10 @@ function App() {
     return (
         <>
             <Menu onNewQuery={onNewQuery}></Menu>
-            <Explored query={query} exploredEntries={exploredEntries} entriesModified={entriesModified}></Explored>
-            <Frontier query={query} exploredEntries={exploredEntries} entriesModified={entriesModified}></Frontier>
+            <Explored query={query} exploredEntries={exploredEntries} 
+                entriesModified={entriesModified} updateExploredEntries={onUpdateExploredEntries}></Explored>
+            <Frontier query={query} exploredEntries={exploredEntries} 
+                entriesModified={entriesModified} updateExploredEntries={onUpdateExploredEntries}></Frontier>
         </>
     );
 }
