@@ -35,13 +35,38 @@ export async function discoverEntries(username: string, entries: Entry[]): Promi
     try {
         console.log("Discover Entries...");
 
-        // let url = `${baseUrl}/discoverEntries`;
-        // let response = await fetch(url, {
-        //     method: 'post',
-        //     body: JSON.stringify(entries),
-        // });
+        let payload = [];
+        for (let entry of entries) {
+            payload.push({
+                entry: entry.entry,
+                displayText: entry.displayText,
+                qualityScore: entry.qualityScore,
+                obscurityScore: entry.obscurityScore,
+            });
+        }
 
-        // await response.json();
+        let url = `${baseUrl}/discoverEntries`;
+        let response = await fetch(url, {
+            method: 'post',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload),
+        });
+
+        await response.json();
+    }
+    catch (e: any) {
+        console.log("Error calling frontierQuery: " + e.message);
+        throw e;
+    }
+}
+
+export async function getAllExplored(minQuality: number, minObscurity: number): Promise<Entry[]> {
+    try {
+        let url = `${baseUrl}/getAllExplored?minQuality=${minQuality}&minObscurity=${minObscurity}`;
+        let response = await fetch(url);
+        let jsonResponse = await response.json();
+        
+        return jsonResponse as Entry[];
     }
     catch (e: any) {
         console.log("Error calling frontierQuery: " + e.message);

@@ -32,6 +32,7 @@ function App() {
             if (existingEntry?.isModified) entry.isModified = true;
             if (!existingEntry || wasEntryModified(existingEntry, entry)) {
                 entry.isModified = true;
+                entry.isSelected = true;
                 editBuffer.current.push(entry);
             }
 

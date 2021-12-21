@@ -3,6 +3,9 @@ export function getStartingWordsToAvoid(): Map<string, number> {
         "a": 50,
         "and": 0,
         "to": 0,
+        "at": 0,
+        "it": 0,
+        "its": 50,
     };
 
     return new Map(Object.entries(values));

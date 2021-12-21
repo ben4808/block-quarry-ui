@@ -50,6 +50,13 @@ export function getDictScoreForEntry(entry: Entry): number {
     return Math.round(finalScore);
 }
 
+export function getDictScoreForEntryAlt(entry: Entry): number {
+    if (!entry.qualityScore) return 0;
+    return entry.qualityScore < 2 ? 25 : 
+        entry.qualityScore < 3 ? 40 :
+        entry.qualityScore < 4 ? 50 : 60;
+}
+
 export function updateEntriesWithKeyPress(selectedEntries: Entry[], key: string) {
     for (let entry of selectedEntries) {
         entry.isExplored = true;
@@ -173,4 +180,13 @@ export function calculateFrontierPriority(entry: Entry): number {
     if (views >= 100) viewsScore = 0;
 
     return (startEndScore + wordCountScore) * (viewsScore/100);
+}
+
+export function getQueryParam(key: string, defaultValue?: string): string {
+    let match = document.location.href.match(`[?&]${key}=([^&]+)`);
+    let result = defaultValue || "";
+    if (match)
+        result = match.groups![1];
+
+    return result;
 }

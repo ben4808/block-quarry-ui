@@ -56,11 +56,16 @@ function Explored(props: ExploredProps) {
         let newArrayMap = new Map<string, boolean>();
 
         let scoreDict = new Map<string, number>();
+        let modifiedDict = new Map<string, boolean>();
         for (let entry of mapValues(newEntries)) {
             scoreDict.set(entry.entry, getDictScoreForEntry(entry));
+            modifiedDict.set(entry.entry, entry.isModified || false);
         }
 
-        let sorted = mapKeys(scoreDict).sort((a, b) => scoreDict.get(b)! - scoreDict.get(a)!);
+        let sorted = mapKeys(scoreDict).sort((a, b) => {
+            return modifiedDict.get(a)! ? -100 : modifiedDict.get(b)! ? 100 :
+                scoreDict.get(b)! - scoreDict.get(a)!
+        });
         for (let key of sorted) {
             newArray.push(newEntries.get(key)!);
             newArrayMap.set(key, true);

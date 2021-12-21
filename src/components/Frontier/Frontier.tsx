@@ -11,6 +11,7 @@ function Frontier(props: FrontierProps) {
     const [frontierEntries, setFrontierEntries] = useState([] as Entry[]);
     const [isLoading, setIsLoading] = useState(false);
     const [page, setPage] = useState(1);
+    const [shouldLoadData, setShouldLoadData] = useState(false);
 
     const results_per_page = 100;
 
@@ -27,6 +28,13 @@ function Frontier(props: FrontierProps) {
         // eslint-disable-next-line
     }, [props.exploredEntries]);
 
+    useEffect(() => {
+        if (shouldLoadData) {
+            loadData();
+        }
+        // eslint-disable-next-line
+    }, [page]);
+
     async function loadData() {
         setIsLoading(true);
         let dataSource = (document.getElementById("data-source-select") as HTMLSelectElement)!.value;
@@ -40,11 +48,11 @@ function Frontier(props: FrontierProps) {
         syncExploredEntries(results);
 
         setIsLoading(false);
+        setShouldLoadData(false);
     }
 
     function syncExploredEntries(newFrontierEntries: Entry[]) {
         for (let entry of newFrontierEntries) {
-            entry.isSelected = false;
             if (props.exploredEntries.has(entry.entry)) {
                 let exploredEntry = props.exploredEntries.get(entry.entry)!;
                 entry.isExplored = true;
@@ -62,12 +70,12 @@ function Frontier(props: FrontierProps) {
             return;
 
         setPage(page + 1);
-        setTimeout(() => { loadData(); }, 500);
+        setShouldLoadData(true);
     }
 
-    function resetPage() {
+    function resetPage(reload: boolean) {
         setPage(1);
-        setTimeout(() => { loadData(); }, 500);
+        setShouldLoadData(reload);
     }
 
     function decrementPage() {
@@ -75,7 +83,7 @@ function Frontier(props: FrontierProps) {
             return;
 
         setPage(page - 1);
-        setTimeout(() => { loadData(); }, 500);
+        setShouldLoadData(true);
     }
 
     function handleEntryClick(event: any) {
@@ -129,7 +137,7 @@ function Frontier(props: FrontierProps) {
         <div id="Frontier">
             <div id="topbar">
                 <label id="data-source-label" htmlFor="data-source-select">Data Source</label>
-                <select id="data-source-select" defaultValue="Podcasts">
+                <select id="data-source-select" defaultValue="Podcasts" onChange={() => resetPage(false)}>
                     <option value="Ginsberg">Ginsberg clues</option>
                     <option value="Podcasts">Podcast database</option>
                     <option value="Nutrimatic">Nutrimatic</option>
@@ -139,7 +147,7 @@ function Frontier(props: FrontierProps) {
                 <div className="frontier-button" onClick={loadData}>Load</div>
 
                 <label id="page-label">Page</label>
-                <div className="frontier-button" onClick={resetPage}>|&lt;</div>
+                <div className="frontier-button" onClick={() => resetPage(true)}>|&lt;</div>
                 <div className="frontier-button" onClick={decrementPage}>&lt;</div>
                 <label id="page">{page}</label>
                 <div className="frontier-button" onClick={incrementPage}>&gt;</div>
