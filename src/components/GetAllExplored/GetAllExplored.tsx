@@ -4,7 +4,7 @@ import { getDictScoreForEntry, getDictScoreForEntryAlt } from "../../lib/utils";
 import { GetAllExploredProps } from "./GetAllExploredProps";
 
 function GetAllExplored(props: GetAllExploredProps) {
-    const data = useRef("");
+    const status = useRef("Loading...");
     const [updateSemaphore, setUpdateSemaphore] = useState(0);
 
     useEffect(() => {
@@ -22,15 +22,25 @@ function GetAllExplored(props: GetAllExploredProps) {
             else
                 lines.push(`${result.entry};${getDictScoreForEntryAlt(result)}`);
         }
+
+        let blob = new Blob([lines.join("\n")]);
+        let filename = `AllExplored.${props.outputFormat}`;
+        let file = new File([blob], filename);
+        const url= window.URL.createObjectURL(file);
+        let downloadLink = document.getElementById("download-link")!;
+        downloadLink.setAttribute("href", url);
+        downloadLink.setAttribute("download", filename);
+        downloadLink.click();
         
-        data.current = lines.join("\n");
+        status.current = "Done.";
         setUpdateSemaphore(updateSemaphore + 1);
     }
 
     return (
-        <pre>
-            {data.current}
-        </pre>
+        <>
+            <a id="download-link" href="http://www.example.com" style={{display: "none"}}>stuff</a>
+            <div>{status.current}</div>
+        </>
     );
 }
 

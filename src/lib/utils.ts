@@ -54,7 +54,8 @@ export function getDictScoreForEntryAlt(entry: Entry): number {
     if (!entry.qualityScore) return 0;
     return entry.qualityScore < 2 ? 25 : 
         entry.qualityScore < 3 ? 40 :
-        entry.qualityScore < 4 ? 50 : 60;
+        entry.qualityScore < 4 ? 50 : 
+        entry.qualityScore < 5 ? 60 : 75;
 }
 
 export function updateEntriesWithKeyPress(selectedEntries: Entry[], key: string) {
@@ -144,7 +145,8 @@ export function setUserId(id?: string) {
     let userId = id || existingId || generateId();
 
     let cookies = new Cookies();
-    cookies.set(cookieKey, userId);
+    let oneYear = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+    cookies.set(cookieKey, userId, {expires: oneYear, sameSite: 'none', secure: true});
 }
 
 export function generateId(): string {

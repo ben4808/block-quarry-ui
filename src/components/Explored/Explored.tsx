@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { discoveredQuery } from '../../api/api';
-import { deepClone, getDictScoreForEntry, mapKeys, mapValues, updateEntriesWithKeyPress } from '../../lib/utils';
+import { exploredQuery } from '../../api/api';
+import { deepClone, getDictScoreForEntry, getDictScoreForEntryAlt, mapKeys, mapValues, updateEntriesWithKeyPress } from '../../lib/utils';
 import { Entry } from '../../models/Entry';
 import EntryComp from '../EntryComp/EntryComp';
 import './Explored.scss';
@@ -17,11 +17,11 @@ function Explored(props: ExploredProps) {
     const entryArrayMap = useRef(new Map<string, boolean>());
 
     useEffect(() => {
-        async function doDiscoveredQuery() {
+        async function doExploredQuery() {
             if (props.query.length === 0) return;
 
             setIsLoading(true);
-            let results = await discoveredQuery(props.query);
+            let results = await exploredQuery(props.query);
             let newEntries = new Map<string, Entry>();
             for (let result of results) {
                 result.isExplored = true;
@@ -32,7 +32,7 @@ function Explored(props: ExploredProps) {
             setIsLoading(false);
         }
 
-        doDiscoveredQuery();
+        doExploredQuery();
         // eslint-disable-next-line
     }, [props.query]);
 
@@ -164,7 +164,7 @@ function Explored(props: ExploredProps) {
             if (exportOnlyChanges && !entry.isModified) return;
             if (exportOnlySelected && !entry.isSelected) return;
 
-            lines.push(`${entry.entry};${getDictScoreForEntry(entry)}`);
+            lines.push(`${entry.entry};${getDictScoreForEntryAlt(entry)}`);
         }); 
         
         window.open()!.document.write(`<pre>${lines.join("\n")}</pre>`);

@@ -1,17 +1,18 @@
+import { mapValues } from "../lib/utils";
 import { Entry } from "../models/Entry";
 
 const baseUrl = "http://localhost:3001/api";
 
-export async function discoveredQuery(query: string): Promise<Entry[]> {
+export async function exploredQuery(query: string): Promise<Entry[]> {
     try {
         let url = baseUrl + "/exploredQuery?query=" + query;
-        let response = await fetch(url);
+        let response = await fetch(url, {credentials: 'include'});
         let jsonResponse = await response.json();
         
         return jsonResponse as Entry[];
     }
     catch (e: any) {
-        console.log("Error calling discoveredQuery: " + e.message);
+        console.log("Error calling exploredQuery: " + e.message);
         throw e;
     }
 }
@@ -20,7 +21,7 @@ export async function frontierQuery(query: string, dataSource: string, page?: nu
     try {
         if (!page) page = 1;
         let url = `${baseUrl}/frontierQuery?query=${query}&dataSource=${dataSource}&page=${page}`;
-        let response = await fetch(url);
+        let response = await fetch(url, {credentials: 'include'});
         let jsonResponse = await response.json();
         
         return jsonResponse as Entry[];
@@ -31,25 +32,26 @@ export async function frontierQuery(query: string, dataSource: string, page?: nu
     }
 }
 
-export async function discoverEntries(username: string, entries: Entry[]): Promise<void> {
+export async function discoverEntries(entries: Entry[]): Promise<void> {
     try {
         console.log("Discover Entries...");
 
-        let payload = [];
+        let payloadMap = new Map<string, Entry>();
         for (let entry of entries) {
-            payload.push({
+            payloadMap.set(entry.entry, {
                 entry: entry.entry,
                 displayText: entry.displayText,
                 qualityScore: entry.qualityScore,
                 obscurityScore: entry.obscurityScore,
-            });
+            } as Entry);
         }
 
         let url = `${baseUrl}/discoverEntries`;
         let response = await fetch(url, {
             method: 'post',
+            credentials: 'include',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(payload),
+            body: JSON.stringify(mapValues(payloadMap)),
         });
 
         await response.json();
@@ -63,7 +65,7 @@ export async function discoverEntries(username: string, entries: Entry[]): Promi
 export async function getAllExplored(minQuality: number, minObscurity: number): Promise<Entry[]> {
     try {
         let url = `${baseUrl}/getAllExplored?minQuality=${minQuality}&minObscurity=${minObscurity}`;
-        let response = await fetch(url);
+        let response = await fetch(url, {credentials: 'include'});
         let jsonResponse = await response.json();
         
         return jsonResponse as Entry[];

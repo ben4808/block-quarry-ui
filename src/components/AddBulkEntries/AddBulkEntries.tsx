@@ -15,8 +15,7 @@ function AddBulkEntries() {
                 entries.push(entry);
         }
 
-        let userId = getUserId();
-        await discoverEntries(userId, entries);
+        await discoverEntries(entries);
     }
 
     function parseLine(line: string): Entry | undefined {

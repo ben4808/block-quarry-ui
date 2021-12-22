@@ -53,8 +53,7 @@ function App() {
     async function sendEdits() {
         if (editBuffer.current.length === 0) return;
 
-        let userId = getUserId();
-        await discoverEntries(userId, editBuffer.current);
+        await discoverEntries(editBuffer.current);
         editBuffer.current = [];
     }
 
