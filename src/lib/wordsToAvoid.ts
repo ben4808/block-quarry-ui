@@ -10,6 +10,7 @@ export function getStartingWordsToAvoid(): Map<string, number> {
         "or": 0,
         "in": 50,
         "is": 0,
+        "we": 50,
     };
 
     return new Map(Object.entries(values));
@@ -33,6 +34,7 @@ export function getEndingWordsToAvoid(): Map<string, number> {
         "in": 50,
         "as": 50,
         "by": 60,
+        "we": 0,
     };
 
     return new Map(Object.entries(values));

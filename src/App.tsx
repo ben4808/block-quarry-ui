@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { discoverEntries } from './api/api';
+import { discoverEntries, exploredQuery } from './api/api';
 import './App.scss';
 import Explored from './components/Explored/Explored';
 import Frontier from './components/Frontier/Frontier';
@@ -10,6 +10,7 @@ import { ModifiedEntry } from './models/ModifiedEntry';
 
 function App() {
     const [query, setQuery] = useState("");
+    const [exploredLoading, setExploredLoading] = useState(false);
     const [exploredEntries, setExploredEntries] = useState(new Map<string, Entry>());
     let editBuffer = useRef([] as ModifiedEntry[]);
 
@@ -17,22 +18,44 @@ function App() {
         setUserId();
     }, []);
 
-    function onNewQuery(query: string) {
+    async function onNewQuery(query: string) {
+        if (query.length === 0) return;
+
         setQuery(query);
+        setExploredLoading(true);
+
+        let results = await exploredQuery(query);
+        let newEntries = new Map<string, Entry>();
+        for (let result of results) {
+            result.isExplored = true;
+            newEntries.set(result.entry, result);
+        }
+        setExploredEntries(newEntries);
+
+        setExploredLoading(false);
     }
 
-    function onUpdateExploredEntries(newEntries: Map<string, Entry>) {
-        setExploredEntries(newEntries);
+    function entriesSelected(newSelectedKeys: string[]) {
+        let newEntriesMap = deepClone(exploredEntries) as Map<string, Entry>;
+
+        for (let entry of mapValues(newEntriesMap)) {
+            entry.isSelected = newSelectedKeys.includes(entry.entry);
+        }
+
+        setExploredEntries(newEntriesMap);
     }
 
     function entriesModified(modifiedEntries: ModifiedEntry[]) {
         let newEntriesMap = deepClone(exploredEntries) as Map<string, Entry>;
 
-        for (let entry of mapValues(newEntriesMap)) {
-            entry.isSelected = false;
-        }
-
         for (let modifiedEntry of modifiedEntries) {
+            let existingBufferEntry = editBuffer.current.find(x => x.entry === modifiedEntry.entry);
+            if (existingBufferEntry) {
+                modifiedEntry.displayText = modifiedEntry.displayText || existingBufferEntry.displayText;
+                modifiedEntry.qualityScore = modifiedEntry.qualityScore || existingBufferEntry.qualityScore;
+                modifiedEntry.obscurityScore = modifiedEntry.obscurityScore || existingBufferEntry.obscurityScore;
+            }
+
             let existingEntry = newEntriesMap.get(modifiedEntry.entry);
             if (!existingEntry) {
                 existingEntry = {
@@ -42,26 +65,19 @@ function App() {
                     obscurityScore: 3,
                     isExplored: true,
                 } as Entry;
+                newEntriesMap.set(existingEntry.entry, existingEntry);
+
+                modifiedEntry.qualityScore = 3;
+                modifiedEntry.obscurityScore = 3;
             }
             existingEntry.displayText = modifiedEntry.displayText || existingEntry.displayText;
             existingEntry.qualityScore = modifiedEntry.qualityScore || existingEntry.qualityScore;
             existingEntry.obscurityScore = modifiedEntry.obscurityScore || existingEntry.obscurityScore;
             existingEntry.isModified = true;
-            existingEntry.isSelected = true;
             editBuffer.current.push(modifiedEntry);
-
-            newEntriesMap.set(existingEntry.entry, existingEntry);
         }
 
         setExploredEntries(newEntriesMap);
-    }
-
-    function wasEntryModified(oldEntry: Entry, newEntry: Entry): boolean {
-        return (
-            oldEntry.displayText !== newEntry.displayText ||
-            oldEntry.qualityScore !== newEntry.qualityScore ||
-            oldEntry.obscurityScore !== newEntry.obscurityScore
-        );
     }
 
     async function sendEdits() {
@@ -76,10 +92,10 @@ function App() {
     return (
         <>
             <Menu onNewQuery={onNewQuery}></Menu>
-            <Explored query={query} exploredEntries={exploredEntries} 
-                entriesModified={entriesModified} updateExploredEntries={onUpdateExploredEntries}></Explored>
+            <Explored exploredEntries={exploredEntries} exploredLoading={exploredLoading}
+                entriesModified={entriesModified} entriesSelected={entriesSelected}></Explored>
             <Frontier query={query} exploredEntries={exploredEntries} 
-                entriesModified={entriesModified} updateExploredEntries={onUpdateExploredEntries}></Frontier>
+                entriesModified={entriesModified} entriesSelected={entriesSelected}></Frontier>
         </>
     );
 }

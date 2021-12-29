@@ -85,7 +85,7 @@ export function updateEntriesWithKeyPress(selectedEntries: Entry[], key: string)
             let newText = prompt("Enter new display text:", entry.displayText);
             if (newText) {
                 let normalized = newText.replaceAll(/[^A-Za-z]/g, "");
-                if (normalized.toUpperCase() !== entry.entry) {
+                if (normalized.toUpperCase() === entry.entry) {
                     entry.displayText = newText;
                     modifiedEntry.displayText = newText;
                 }

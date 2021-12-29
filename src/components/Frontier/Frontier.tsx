@@ -94,19 +94,15 @@ function Frontier(props: FrontierProps) {
             target = target.parentElement;
             if (!target) return;
         }
-        
-        let newExploredEntries = deepClone(props.exploredEntries) as Map<string, Entry>;
-        let newFrontierEntries = deepClone(frontierEntries) as Entry[];
-        let targetEntry = newFrontierEntries.find(x => x.entry === target.dataset["entrykey"])!;
 
-        for (let entry of newFrontierEntries) entry.isSelected = false;
-        for (let entry of mapValues(newExploredEntries)) entry.isSelected = false;
-        targetEntry.isSelected = true;
-        if (newExploredEntries.has(targetEntry.entry))
-            newExploredEntries.get(targetEntry.entry)!.isSelected = true;
-        
-        props.updateExploredEntries(newExploredEntries);
+        let targetKey = target.dataset["entrykey"];
+        let newFrontierEntries = deepClone(frontierEntries) as Entry[];
+        for (let entry of newFrontierEntries) {
+            entry.isSelected = entry.entry === targetKey;
+        }
         setFrontierEntries(newFrontierEntries);
+
+        props.entriesSelected([targetKey]);
     }
 
     function handleKeyDown(event: any) {
@@ -116,8 +112,14 @@ function Frontier(props: FrontierProps) {
         let selectedEntry = newFrontierEntries.find(x => x.isSelected);
         if (!selectedEntry) return;
 
-        selectedEntry.isSelected = false;
         let modifiedEntries = updateEntriesWithKeyPress([selectedEntry], key);
+
+        for (let mod of modifiedEntries) {
+            if (!props.exploredEntries.has(mod.entry)) {
+                mod.displayText = selectedEntry.displayText;
+            }
+        }
+
         setFrontierEntries(newFrontierEntries);
         props.entriesModified(modifiedEntries);
     }

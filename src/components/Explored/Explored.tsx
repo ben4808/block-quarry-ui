@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { exploredQuery } from '../../api/api';
 import { deepClone, getDictScoreForEntry, getDictScoreForEntryAlt, mapKeys, mapValues, updateEntriesWithKeyPress } from '../../lib/utils';
 import { Entry } from '../../models/Entry';
 import { ModifiedEntry } from '../../models/ModifiedEntry';
@@ -9,7 +8,6 @@ import { ExploredProps } from './ExploredProps';
 
 function Explored(props: ExploredProps) {
     const [lastSelectedKey, setLastSelectedKey] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
     const [exportOnlyChanges, setExportOnlyChanges] = useState(true);
     const [exportOnlySelected, setExportOnlySelected] = useState(false);
     const [updateSemaphore, setUpdateSemaphore] = useState(0);
@@ -18,36 +16,7 @@ function Explored(props: ExploredProps) {
     const entryArrayMap = useRef(new Map<string, boolean>());
 
     useEffect(() => {
-        async function doExploredQuery() {
-            if (props.query.length === 0) return;
-
-            setIsLoading(true);
-            let results = await exploredQuery(props.query);
-            let newEntries = new Map<string, Entry>();
-            for (let result of results) {
-                result.isExplored = true;
-                newEntries.set(result.entry, result);
-            }
-            props.updateExploredEntries(newEntries);
-            generateEntryArray(newEntries);
-            setIsLoading(false);
-        }
-
-        doExploredQuery();
-        // eslint-disable-next-line
-    }, [props.query]);
-
-    useEffect(() => {
-        for (let entry of mapValues(props.exploredEntries)) {
-            if (!entryArrayMap.current.has(entry.entry)) {
-                entryArray.current.unshift(entry);
-                entryArrayMap.current.set(entry.entry, true);
-            }
-            else {
-                generateEntryArray(props.exploredEntries);
-            }
-        }
-
+        generateEntryArray(props.exploredEntries);
         setUpdateSemaphore(updateSemaphore + 1);
         // eslint-disable-next-line
     }, [props.exploredEntries]);
@@ -87,50 +56,44 @@ function Explored(props: ExploredProps) {
 
         if (entryArray.current.length === 0) return;
 
-        let newEntriesMap = deepClone(props.exploredEntries) as Map<string, Entry>;
-        if (!event.ctrlKey) {
-            for (let entry of mapValues(newEntriesMap)) {
-                entry.isSelected = false;
+        let newSelectedKeys = [] as string[];
+        let targetKey = target.dataset["entrykey"];
+
+        if (event.ctrlKey) {
+            for (let entry of mapValues(props.exploredEntries)) {
+                if (entry.isSelected) newSelectedKeys.push(entry.entry);
             }
         }
-
-        let targetEntry = newEntriesMap.get(target.dataset["entrykey"])!;
         if (lastSelectedKey && event.shiftKey) {
             let lastSelectedIndex = entryArray.current.findIndex(x => x.entry === lastSelectedKey);
-            let targetIndex = entryArray.current.findIndex(x => x.entry === targetEntry.entry);
+            let targetIndex = entryArray.current.findIndex(x => x.entry === targetKey);
             let minIndex = Math.min(lastSelectedIndex, targetIndex);
             let maxIndex = Math.max(lastSelectedIndex, targetIndex);
             for (let i = minIndex; i <= maxIndex; i++ ) {
-                let entry = newEntriesMap.get(entryArray.current[i].entry)!;
-                if (!entry.isSelected) {
-                    entry.isSelected = true;
-                }
+                newSelectedKeys.push(entryArray.current[i].entry);
             }
         }
         else { 
-            targetEntry.isSelected = !targetEntry.isSelected;
-            setLastSelectedKey(targetEntry.entry);
+            if (newSelectedKeys.includes(targetKey))
+                newSelectedKeys = newSelectedKeys.filter(x => x !== targetKey);
+            else
+                newSelectedKeys.push(targetKey);
+
+            setLastSelectedKey(targetKey);
         }
         
-        props.updateExploredEntries(newEntriesMap);
-        generateEntryArray(newEntriesMap);
+        props.entriesSelected(newSelectedKeys);
     }
 
     function handleDeselect(event: any) {
         let target = event.target;
-        while (true) {
-            if (!target) break;
-            if (target.classList[0] === "entry-shell") return;
+        while (target.classList.length < 1 || target.classList[0] !== "entry-shell") {
             target = target.parentElement;
+            if (!target) break;
         }
 
-        let newEntriesMap = deepClone(props.exploredEntries) as Map<string, Entry>;
-        for (let entry of mapValues(newEntriesMap)) {
-            entry.isSelected = false;
-        }
-
-        props.updateExploredEntries(newEntriesMap);
-        generateEntryArray(newEntriesMap);
+        if (!target)
+            props.entriesSelected([]);
     }
 
     function handleKeyDown(event: any) {
@@ -199,13 +162,13 @@ function Explored(props: ExploredProps) {
                 <input type="text" id="new-entry" placeholder="Add Entry..." onKeyDown={addNewEntry}></input>
             </div>
             <div onKeyDown={handleKeyDown} onClick={handleEntryClick} tabIndex={0}>
-                {isLoading &&
+                {props.exploredLoading &&
                     <div>Loading...</div>
                 }
-                {!isLoading && entryArray.current.length === 0 && 
+                {!props.exploredLoading && entryArray.current.length === 0 && 
                     <i>No results</i>
                 }
-                {!isLoading && entryArray.current.map(entry => (
+                {!props.exploredLoading && entryArray.current.map(entry => (
                     <EntryComp isFrontier={false} key={entry.entry} entry={entry}></EntryComp>
                 ))}
             </div>
