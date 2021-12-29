@@ -1,4 +1,5 @@
 import { Entry } from "../models/Entry";
+import { ModifiedEntry } from "../models/ModifiedEntry";
 
 const asteroids = ["Ceres", "Pallas", "Juno", "Vesta", "Astraea", "Hebe", "Iris", "Flora", "Metis", "Hygiea"];
 
@@ -20,6 +21,6 @@ export async function frontierQuery(query: string, dataSource: string): Promise<
     }) as Entry);
 }
 
-export async function discoverEntries(username: string, entries: Entry[]): Promise<void> {
+export async function discoverEntries(username: string, entries: ModifiedEntry[]): Promise<void> {
     
 }

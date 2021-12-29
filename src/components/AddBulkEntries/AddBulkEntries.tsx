@@ -1,5 +1,4 @@
 import { discoverEntries } from "../../api/api";
-import { getUserId } from "../../lib/utils";
 import { Entry } from "../../models/Entry";
 
 function AddBulkEntries() {

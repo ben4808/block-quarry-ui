@@ -43,7 +43,9 @@ function Frontier(props: FrontierProps) {
         for (let result of results) {
             result.frontierPriority = calculateFrontierPriority(result);
         }
-        results = results.sort((a, b) => b.frontierPriority! - a.frontierPriority!);
+        results = results.sort((a, b) => b.frontierPriority! !== a.frontierPriority! ?
+            b.frontierPriority! - a.frontierPriority! :
+            b.entry < a.entry ? 1 : -1);
 
         syncExploredEntries(results);
 
@@ -115,9 +117,9 @@ function Frontier(props: FrontierProps) {
         if (!selectedEntry) return;
 
         selectedEntry.isSelected = false;
-        updateEntriesWithKeyPress([selectedEntry], key);
+        let modifiedEntries = updateEntriesWithKeyPress([selectedEntry], key);
         setFrontierEntries(newFrontierEntries);
-        props.entriesModified([selectedEntry]);
+        props.entriesModified(modifiedEntries);
     }
 
     let entryBatches = [] as Entry[][];

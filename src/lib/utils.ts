@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Entry } from "../models/Entry";
 import { Cookies } from 'react-cookie';
 import { getEndingWordsToAvoid, getStartingWordsToAvoid } from "./wordsToAvoid";
+import { ModifiedEntry } from "../models/ModifiedEntry";
 
 export const cookieKey = "block_quarry_user";
 
@@ -58,61 +59,44 @@ export function getDictScoreForEntryAlt(entry: Entry): number {
         entry.qualityScore < 5 ? 60 : 75;
 }
 
-export function updateEntriesWithKeyPress(selectedEntries: Entry[], key: string) {
+export function updateEntriesWithKeyPress(selectedEntries: Entry[], key: string): ModifiedEntry[] {
+    let modifiedEntries = [] as ModifiedEntry[];
+
     for (let entry of selectedEntries) {
         entry.isExplored = true;
-        if (!entry.qualityScore) entry.qualityScore = 3;
-        if (!entry.obscurityScore) entry.obscurityScore = 3;
+        let modifiedEntry = {
+            entry: entry.entry,
+        } as ModifiedEntry;
+
+        if (key === "W") { entry.qualityScore = 5; modifiedEntry.qualityScore = 5; }
+        if (key === "A") { entry.qualityScore = 2; modifiedEntry.qualityScore = 2; }
+        if (key === "S") { entry.qualityScore = 3; modifiedEntry.qualityScore = 3; }
+        if (key === "D") { entry.qualityScore = 4; modifiedEntry.qualityScore = 4; }
+        if (key === "Z") { entry.qualityScore = 1; modifiedEntry.qualityScore = 1; }
+        if (key === "X") { entry.qualityScore = 0; modifiedEntry.qualityScore = 0; }
+        if (key === "0") { entry.obscurityScore = 0; modifiedEntry.obscurityScore = 0; }
+        if (key === "1") { entry.obscurityScore = 1; modifiedEntry.obscurityScore = 1; }
+        if (key === "2") { entry.obscurityScore = 2; modifiedEntry.obscurityScore = 2; }
+        if (key === "3") { entry.obscurityScore = 3; modifiedEntry.obscurityScore = 3; }
+        if (key === "4") { entry.obscurityScore = 4; modifiedEntry.obscurityScore = 4; }
+        if (key === "5") { entry.obscurityScore = 5; modifiedEntry.obscurityScore = 5; }
+
+        if (selectedEntries.length === 1 && key === 'R') {
+            let newText = prompt("Enter new display text:", entry.displayText);
+            if (newText) {
+                let normalized = newText.replaceAll(/[^A-Za-z]/g, "");
+                if (normalized.toUpperCase() !== entry.entry) {
+                    entry.displayText = newText;
+                    modifiedEntry.displayText = newText;
+                }
+            }
+        }
+
+        if (modifiedEntry.displayText || modifiedEntry.qualityScore || modifiedEntry.obscurityScore)
+            modifiedEntries.push(modifiedEntry);
     }
-            
-    if (key === "W") {
-        for (let entry of selectedEntries)
-            entry.qualityScore = 5;
-    }
-    if (key === "A") {
-        for (let entry of selectedEntries)
-            entry.qualityScore = 2;
-    }
-    if (key === "S") {
-        for (let entry of selectedEntries)
-            entry.qualityScore = 3;
-    }
-    if (key === "D") {
-        for (let entry of selectedEntries)
-            entry.qualityScore = 4;
-    }
-    if (key === "Z") {
-        for (let entry of selectedEntries)
-            entry.qualityScore = 1;
-    }
-    if (key === "X") {
-        for (let entry of selectedEntries)
-            entry.qualityScore = 0;
-    }
-    if (key === "0") {
-        for (let entry of selectedEntries)
-            entry.obscurityScore = 0;
-    }
-    if (key === "1") {
-        for (let entry of selectedEntries)
-            entry.obscurityScore = 1;
-    }
-    if (key === "2") {
-        for (let entry of selectedEntries)
-            entry.obscurityScore = 2;
-    }
-    if (key === "3") {
-        for (let entry of selectedEntries)
-            entry.obscurityScore = 3;
-    }
-    if (key === "4") {
-        for (let entry of selectedEntries)
-            entry.obscurityScore = 4;
-    }
-    if (key === "5") {
-        for (let entry of selectedEntries)
-            entry.obscurityScore = 5;
-    }
+
+    return modifiedEntries;
 }
 
 export function useInterval(callback: () => void, delay: number) {

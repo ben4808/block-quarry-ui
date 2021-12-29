@@ -1,5 +1,6 @@
 import { mapValues } from "../lib/utils";
 import { Entry } from "../models/Entry";
+import { ModifiedEntry } from "../models/ModifiedEntry";
 
 const baseUrl = "http://localhost:3001/api";
 
@@ -32,7 +33,7 @@ export async function frontierQuery(query: string, dataSource: string, page?: nu
     }
 }
 
-export async function discoverEntries(entries: Entry[]): Promise<void> {
+export async function discoverEntries(entries: ModifiedEntry[]): Promise<void> {
     try {
         console.log("Discover Entries...");
 

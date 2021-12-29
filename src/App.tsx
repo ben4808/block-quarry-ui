@@ -4,13 +4,14 @@ import './App.scss';
 import Explored from './components/Explored/Explored';
 import Frontier from './components/Frontier/Frontier';
 import Menu from './components/Menu/Menu';
-import { deepClone, getUserId, setUserId, useInterval } from './lib/utils';
+import { deepClone, mapValues, setUserId, useInterval } from './lib/utils';
 import { Entry } from './models/Entry';
+import { ModifiedEntry } from './models/ModifiedEntry';
 
 function App() {
     const [query, setQuery] = useState("");
     const [exploredEntries, setExploredEntries] = useState(new Map<string, Entry>());
-    let editBuffer = useRef([] as Entry[]);
+    let editBuffer = useRef([] as ModifiedEntry[]);
 
     useEffect(() => {
         setUserId();
@@ -24,19 +25,32 @@ function App() {
         setExploredEntries(newEntries);
     }
 
-    function entriesModified(newEntries: Entry[]) {
+    function entriesModified(modifiedEntries: ModifiedEntry[]) {
         let newEntriesMap = deepClone(exploredEntries) as Map<string, Entry>;
 
-        for (let entry of newEntries) {
-            let existingEntry = newEntriesMap.get(entry.entry);
-            if (existingEntry?.isModified) entry.isModified = true;
-            if (!existingEntry || wasEntryModified(existingEntry, entry)) {
-                entry.isModified = true;
-                entry.isSelected = true;
-                editBuffer.current.push(entry);
-            }
+        for (let entry of mapValues(newEntriesMap)) {
+            entry.isSelected = false;
+        }
 
-            newEntriesMap.set(entry.entry, entry);
+        for (let modifiedEntry of modifiedEntries) {
+            let existingEntry = newEntriesMap.get(modifiedEntry.entry);
+            if (!existingEntry) {
+                existingEntry = {
+                    entry: modifiedEntry.entry,
+                    displayText: modifiedEntry.displayText!,
+                    qualityScore: 3,
+                    obscurityScore: 3,
+                    isExplored: true,
+                } as Entry;
+            }
+            existingEntry.displayText = modifiedEntry.displayText || existingEntry.displayText;
+            existingEntry.qualityScore = modifiedEntry.qualityScore || existingEntry.qualityScore;
+            existingEntry.obscurityScore = modifiedEntry.obscurityScore || existingEntry.obscurityScore;
+            existingEntry.isModified = true;
+            existingEntry.isSelected = true;
+            editBuffer.current.push(modifiedEntry);
+
+            newEntriesMap.set(existingEntry.entry, existingEntry);
         }
 
         setExploredEntries(newEntriesMap);

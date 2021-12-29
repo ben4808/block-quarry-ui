@@ -6,6 +6,10 @@ export function getStartingWordsToAvoid(): Map<string, number> {
         "at": 0,
         "it": 0,
         "its": 50,
+        "of": 0,
+        "or": 0,
+        "in": 50,
+        "is": 0,
     };
 
     return new Map(Object.entries(values));

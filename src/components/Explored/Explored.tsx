@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { exploredQuery } from '../../api/api';
 import { deepClone, getDictScoreForEntry, getDictScoreForEntryAlt, mapKeys, mapValues, updateEntriesWithKeyPress } from '../../lib/utils';
 import { Entry } from '../../models/Entry';
+import { ModifiedEntry } from '../../models/ModifiedEntry';
 import EntryComp from '../EntryComp/EntryComp';
 import './Explored.scss';
 import { ExploredProps } from './ExploredProps';
@@ -63,7 +64,9 @@ function Explored(props: ExploredProps) {
         }
 
         let sorted = mapKeys(scoreDict).sort((a, b) => {
-            return modifiedDict.get(a)! ? -100 : modifiedDict.get(b)! ? 100 :
+            let aMod = modifiedDict.get(a)!;
+            let bMod = modifiedDict.get(b)!;
+            return (aMod && !bMod) ? -100 : (bMod && !aMod) ? 100 :
                 scoreDict.get(b)! - scoreDict.get(a)!
         });
         for (let key of sorted) {
@@ -136,17 +139,8 @@ function Explored(props: ExploredProps) {
         let selectedEntries = deepClone(mapValues(props.exploredEntries).filter(x => x.isSelected));
         if (selectedEntries.length === 0) return;
 
-        updateEntriesWithKeyPress(selectedEntries, key);
-
-        if (selectedEntries.length === 1 && key === 'R') {
-            let newText = prompt("Enter new display text:", selectedEntries[0].displayText);
-            if (!newText) return;
-            let normalized = newText.replaceAll(/[^A-Za-z]/g, "");
-            if (normalized.toUpperCase() !== selectedEntries[0].entry) return;
-            selectedEntries[0].displayText = newText;
-        }
-
-        props.entriesModified(selectedEntries);
+        let modifiedEntries = updateEntriesWithKeyPress(selectedEntries, key);
+        props.entriesModified(modifiedEntries);
     }
 
     function handleOnlyChangesToggle() {
@@ -177,28 +171,12 @@ function Explored(props: ExploredProps) {
         let newText = textbox!.value;
         if (key === "Enter") {
             let normalized = newText.replaceAll(/[^A-Za-z]/g, "").toUpperCase();
-            let newEntries = [] as Entry[];
             let newEntry = {
                 entry: normalized,
                 displayText: newText,
-                qualityScore: 3,
-                obscurityScore: 3,
-                isSelected: true,
-                isExplored: true,
-                isModified: true,
-            } as Entry;
+            } as ModifiedEntry;
 
-            newEntries.push(newEntry);
-            mapValues(props.exploredEntries).forEach(entry => {
-                if (entry.isSelected) {
-                    entry.isSelected = false;
-                    newEntries.push(entry);
-                }
-            });
-
-            entryArray.current.unshift(newEntry);
-            entryArrayMap.current.set(newEntry.entry, true);
-            props.entriesModified(newEntries);
+            props.entriesModified([newEntry]);
             textbox.value = "";
         }
     }
