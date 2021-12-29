@@ -67,8 +67,8 @@ function App() {
                 } as Entry;
                 newEntriesMap.set(existingEntry.entry, existingEntry);
 
-                modifiedEntry.qualityScore = 3;
-                modifiedEntry.obscurityScore = 3;
+                modifiedEntry.qualityScore = modifiedEntry.qualityScore || 3;
+                modifiedEntry.obscurityScore = modifiedEntry.obscurityScore || 3;
             }
             existingEntry.displayText = modifiedEntry.displayText || existingEntry.displayText;
             existingEntry.qualityScore = modifiedEntry.qualityScore || existingEntry.qualityScore;

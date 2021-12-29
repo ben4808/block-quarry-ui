@@ -147,6 +147,7 @@ function Frontier(props: FrontierProps) {
                     <option value="Nutrimatic">Nutrimatic</option>
                     <option value="OneLook">OneLook</option>
                     <option value="Newspapers">Newspapers</option>
+                    <option value="Husic">Spread the Word List</option>
                 </select>
                 <div className="frontier-button" onClick={loadData}>Load</div>
 
