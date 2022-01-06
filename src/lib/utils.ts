@@ -172,7 +172,7 @@ export function getQueryParam(key: string, defaultValue?: string): string {
     let match = document.location.href.match(`[?&]${key}=([^&]+)`);
     let result = defaultValue || "";
     if (match)
-        result = match.groups![1];
+        result = match[1];
 
     return result;
 }

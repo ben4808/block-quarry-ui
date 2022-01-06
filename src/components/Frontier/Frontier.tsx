@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { frontierQuery } from '../../api/api';
-import { calculateFrontierPriority, deepClone, mapValues, updateEntriesWithKeyPress } from '../../lib/utils';
+import { calculateFrontierPriority, deepClone, updateEntriesWithKeyPress } from '../../lib/utils';
 import { Entry } from '../../models/Entry';
 import EntryComp from '../EntryComp/EntryComp';
 import "../Explored/Explored.scss"
