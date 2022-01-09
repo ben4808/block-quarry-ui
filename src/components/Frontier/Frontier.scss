@@ -5,6 +5,8 @@
     width: 1200px;
     min-height: 725px;
     vertical-align: top;
+    background-color: #333;
+    color: #ccc;
 }
 
 .frontier-button {
@@ -14,6 +16,7 @@
     padding: 0 5px;
     cursor: pointer;
     background-color: #ddd;
+    color: black;
 }
 .frontier-button:hover {
     background-color: #bbb;
@@ -28,6 +31,8 @@
     font-size: 14px;
     padding: 5px;
     margin-bottom: 3px;
+    background-color: #777;
+    color: #eee;
 }
 
 #page-label {

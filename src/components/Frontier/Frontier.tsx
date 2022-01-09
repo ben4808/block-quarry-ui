@@ -13,8 +13,6 @@ function Frontier(props: FrontierProps) {
     const [page, setPage] = useState(1);
     const [shouldLoadData, setShouldLoadData] = useState(false);
 
-    const results_per_page = 100;
-
     useEffect(() => {
         setFrontierEntries([] as Entry[]);
         setIsLoading(false);
@@ -68,7 +66,7 @@ function Frontier(props: FrontierProps) {
     }
 
     function incrementPage() {
-        if (frontierEntries.length < results_per_page)
+        if (frontierEntries.length < 1)
             return;
 
         setPage(page + 1);
@@ -124,6 +122,25 @@ function Frontier(props: FrontierProps) {
         props.entriesModified(modifiedEntries);
     }
 
+    function handleDeselect(event: any) {
+        let target = event.target;
+        while (target.classList.length < 1 || target.classList[0] !== "entry-shell") {
+            target = target.parentElement;
+            if (!target) break;
+        }
+
+        if (!target) {
+            let newFrontierEntries = deepClone(frontierEntries) as Entry[];
+            for (let entry of newFrontierEntries) {
+                entry.isSelected = false;
+            }
+            setFrontierEntries(newFrontierEntries);
+
+            props.entriesSelected([]);
+        }
+            
+    }
+
     let entryBatches = [] as Entry[][];
     let i = 0;
     let entriesPerBatch = 23;
@@ -138,7 +155,7 @@ function Frontier(props: FrontierProps) {
     }
 
     return (
-        <div id="Frontier">
+        <div id="Frontier" onClick={handleDeselect}>
             <div id="topbar">
                 <label id="data-source-label" htmlFor="data-source-select">Data Source</label>
                 <select id="data-source-select" defaultValue="Podcasts" onChange={() => resetPage(false)}>

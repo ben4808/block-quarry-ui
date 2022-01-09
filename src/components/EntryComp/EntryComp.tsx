@@ -2,18 +2,18 @@ import './EntryComp.scss';
 import { EntryCompProps } from './EntryCompProps';
 
 function EntryComp(props: EntryCompProps) {
-    function getScoreColor(score: number, lightColor: boolean): string {
-        let lightGray = [0xf5, 0xf5, 0xf5];
-        let lightRed = [0xfa, 0x8e, 0x95];
-        let lightGreen = [0x93, 0xe7, 0xb6];
+    function getScoreColor(score: number, isBorderColor: boolean): string {
+        let backGray = [0x50, 0x50, 0x50];
+        let backRed = [0x65, 0x2d, 0x36];
+        let backGreen = [0x2f, 0x73, 0x4c];
 
-        let darkGray = [0xa0, 0xa0, 0xa0];
-        let darkRed = [0xc8, 0x08, 0x15];
-        let darkGreen = [0x27, 0xae, 0x60];
+        let borderGray = [0x77, 0x77, 0x77];
+        let borderRed = [0x95, 0x13, 0x1c];
+        let borderGreen = [0x2d, 0x81, 0x50];
 
-        let gray = lightColor ? lightGray : darkGray;
-        let red = lightColor ? lightRed : darkRed;
-        let green = lightColor ? lightGreen : darkGreen;
+        let gray = isBorderColor ? borderGray : backGray;
+        let red = isBorderColor ? borderRed : backRed;
+        let green = isBorderColor ? borderGreen : backGreen;
 
         let ret = "#";
         if (score <= 3) {
@@ -50,8 +50,9 @@ function EntryComp(props: EntryCompProps) {
                     props.entry.views! >= 5 ? " views-5" : ""
                 ) : "") }
                 style={{
-                    backgroundColor: props.entry.isExplored ? getScoreColor(props.entry.qualityScore!, true) : "white",
-                    borderColor: props.entry.isExplored ? getScoreColor(props.entry.obscurityScore!, false) : "#eee",
+                    backgroundColor: props.entry.isExplored ? getScoreColor(props.entry.qualityScore!, false) : "#383838",
+                    borderColor: props.entry.isExplored ? getScoreColor(props.entry.obscurityScore!, true) : "#444",
+                    color: props.entry.isExplored ? "white" : "#ccc",
                 }}>
                 {props.entry.displayText}
             </div>

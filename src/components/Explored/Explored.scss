@@ -2,26 +2,35 @@
     display: inline-block;
     clear: both;
     font-family: Verdana, sans-serif;
-    border-right: 2px solid #ccc;
+    border-right: 2px solid #666;
     width: 300px;
     height: 750px;
     overflow-y: scroll;
     vertical-align: top;
-    border-bottom: 2px solid #ccc;
+    border-bottom: 2px solid #666;
+    background-color: #333;
+    color: #ccc;
 }
 
 #topbar {
-    background-color: #eee;
+    background-color: #555;
     padding: 5px 0 2px 15px;
 }
 
 #topbar2 {
-    background-color: #eee;
+    background-color: #555;
     padding: 0 0 10px 15px;
 
     input {
         width: 200px;
         font-size: 12px;
+        background-color: #777;
+        border: none;
+        color: #eee;
+
+        &::placeholder {
+            color: #ccc;
+        }
     }
 }
 
@@ -33,6 +42,7 @@
     cursor: pointer;
     background-color: #ddd;
     margin-top: 5px;
+    color: black;
 }
 .fill-list-button:hover {
     background-color: #bbb;

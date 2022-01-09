@@ -64,6 +64,7 @@ function App() {
                     qualityScore: 3,
                     obscurityScore: 3,
                     isExplored: true,
+                    isSelected: true,
                 } as Entry;
                 newEntriesMap.set(existingEntry.entry, existingEntry);
 

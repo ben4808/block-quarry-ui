@@ -1,4 +1,15 @@
-html, body {
+html, body, #root {
     font-family: Verdana, sans-serif;
     margin: 0;
+    background-color: #333;
+    color: #ccc;
+}
+
+::-webkit-scrollbar {
+    width: 15;  /* Remove scrollbar space */
+    background: #777;  /* Optional: just make scrollbar invisible */
+}
+
+::-webkit-scrollbar-thumb {
+    background: #444;  /* Optional: just make scrollbar invisible */
 }

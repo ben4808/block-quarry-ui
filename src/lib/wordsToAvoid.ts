@@ -36,6 +36,7 @@ export function getStartingWordsToAvoid(): Map<string, number> {
         "because": 50,
         "before": 50,
         "by": 50,
+        "so": 50,
     };
 
     return new Map(Object.entries(values));

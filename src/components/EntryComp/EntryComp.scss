@@ -1,18 +1,19 @@
 .entry {
     border-style: solid;
     border-width: 2px;
-    border-color: #eee;
     display: inline-block;
     border-radius: 5px;
     padding: 0 5px;
     font-size: 14px;
     position: relative;
     top: -4px;
+    color: white;
 }
 .frontier-entry {
     display: inline-block;
 }
 
+/*
 .views-100 {
     background-color: lighten(#fba7ac, 5%);
 }
@@ -22,6 +23,7 @@
 .views-5 {
     background-color: lighten(#fba7ac, 15%);
 }
+*/
 
 .modified-bar {
     display: inline-block;
@@ -32,7 +34,7 @@
     top: 2px;
 }
 .modified-bar-green {
-    background-color: mediumseagreen;
+    background-color: darken(mediumseagreen, 10%);
 }
 
 .entry-shell {
@@ -41,7 +43,7 @@
 
     &:hover {
         cursor: pointer;
-        background-color: #eee;
+        background-color: #444;
     }
 }
 .entry-shell-frontier {
@@ -49,9 +51,9 @@
     height: 30px;
 }
 .entry-shell-selected {
-    background-color: lightblue;
+    background-color: #274965;
 
     &:hover {
-        background-color: lightblue;
+        background-color: #274965;
     }
 }
