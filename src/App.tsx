@@ -93,7 +93,7 @@ function App() {
     return (
         <>
             <Menu onNewQuery={onNewQuery}></Menu>
-            <Explored exploredEntries={exploredEntries} exploredLoading={exploredLoading}
+            <Explored query={query} exploredEntries={exploredEntries} exploredLoading={exploredLoading}
                 entriesModified={entriesModified} entriesSelected={entriesSelected}></Explored>
             <Frontier query={query} exploredEntries={exploredEntries} 
                 entriesModified={entriesModified} entriesSelected={entriesSelected}></Frontier>

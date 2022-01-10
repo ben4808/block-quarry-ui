@@ -16,6 +16,12 @@ function Explored(props: ExploredProps) {
     const entryArrayMap = useRef(new Map<string, boolean>());
 
     useEffect(() => {
+        entryArray.current = [];
+        entryArrayMap.current = new Map<string, boolean>();
+        // eslint-disable-next-line
+    }, [props.query]);
+
+    useEffect(() => {
         generateEntryArray(props.exploredEntries);
         setUpdateSemaphore(updateSemaphore + 1);
         // eslint-disable-next-line
