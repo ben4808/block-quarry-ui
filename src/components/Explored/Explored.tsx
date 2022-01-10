@@ -25,22 +25,31 @@ function Explored(props: ExploredProps) {
         let newArray = [] as Entry[];
         let newArrayMap = new Map<string, boolean>();
 
-        let scoreDict = new Map<string, number>();
-        let modifiedDict = new Map<string, boolean>();
-        for (let entry of mapValues(newEntries)) {
-            scoreDict.set(entry.entry, getDictScoreForEntry(entry));
-            modifiedDict.set(entry.entry, entry.isModified || false);
-        }
+        if (entryArray.current.length == 0) {
+            let scoreDict = new Map<string, number>();
+            for (let entry of mapValues(newEntries)) {
+                scoreDict.set(entry.entry, getDictScoreForEntry(entry));
+            }
 
-        let sorted = mapKeys(scoreDict).sort((a, b) => {
-            let aMod = modifiedDict.get(a)!;
-            let bMod = modifiedDict.get(b)!;
-            return (aMod && !bMod) ? -100 : (bMod && !aMod) ? 100 :
-                scoreDict.get(b)! - scoreDict.get(a)!
-        });
-        for (let key of sorted) {
-            newArray.push(newEntries.get(key)!);
-            newArrayMap.set(key, true);
+            let sorted = mapKeys(scoreDict).sort((a, b) => scoreDict.get(b)! - scoreDict.get(a)!);
+            for (let key of sorted) {
+                newArray.push(newEntries.get(key)!);
+                newArrayMap.set(key, true);
+            }
+        }
+        else {
+            for (let curEntry of entryArray.current) {
+                let key = curEntry.entry;
+                let entry = newEntries.get(key)!;
+                newArray.push(entry);
+                newArrayMap.set(curEntry.entry, true);
+            }
+            for (let entry of mapValues(newEntries)) {
+                if (!newArrayMap.has(entry.entry)) {
+                    newArray.unshift(entry);
+                    newArrayMap.set(entry.entry, true);
+                }
+            }
         }
 
         entryArray.current = newArray;
