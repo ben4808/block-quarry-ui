@@ -31,13 +31,16 @@ function Explored(props: ExploredProps) {
         let newArray = [] as Entry[];
         let newArrayMap = new Map<string, boolean>();
 
-        if (entryArray.current.length == 0) {
+        if (entryArray.current.length === 0) {
             let scoreDict = new Map<string, number>();
             for (let entry of mapValues(newEntries)) {
                 scoreDict.set(entry.entry, getDictScoreForEntry(entry));
             }
 
-            let sorted = mapKeys(scoreDict).sort((a, b) => scoreDict.get(b)! - scoreDict.get(a)!);
+            let sorted = mapKeys(scoreDict).sort((a, b) => {
+                if (scoreDict.get(b)! === scoreDict.get(a)!) return a < b ? -1 : 1;
+                return scoreDict.get(b)! - scoreDict.get(a)!;
+            });
             for (let key of sorted) {
                 newArray.push(newEntries.get(key)!);
                 newArrayMap.set(key, true);

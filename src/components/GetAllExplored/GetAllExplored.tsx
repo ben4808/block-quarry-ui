@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getAllExplored } from "../../api/api";
-import { getDictScoreForEntry, getDictScoreForEntryAlt } from "../../lib/utils";
+import { getDictScoreForEntryAlt } from "../../lib/utils";
 import { GetAllExploredProps } from "./GetAllExploredProps";
 
 function GetAllExplored(props: GetAllExploredProps) {
@@ -18,7 +18,7 @@ function GetAllExplored(props: GetAllExploredProps) {
         let lines = [] as string[];
         for (let result of results) {
             if (props.outputFormat === "csv")
-                lines.push(`${result.entry},"${result.displayText}",${getDictScoreForEntry(result)}`);
+                lines.push(`${result.entry},"${result.displayText}",${result.qualityScore?.toFixed(2)},${result.obscurityScore?.toFixed(2)}`);
             else
                 lines.push(`${result.entry};${getDictScoreForEntryAlt(result)}`);
         }

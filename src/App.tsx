@@ -21,7 +21,8 @@ function App() {
     async function onNewQuery(query: string) {
         if (query.length === 0) return;
 
-        setQuery(query);
+        setQuery("");
+        setTimeout(() => setQuery(query));
         setExploredLoading(true);
 
         let results = await exploredQuery(query);

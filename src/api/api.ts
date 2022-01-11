@@ -1,8 +1,9 @@
 import { mapValues } from "../lib/utils";
 import { Entry } from "../models/Entry";
 import { ModifiedEntry } from "../models/ModifiedEntry";
+import settings from "../settings.json";
 
-const baseUrl = "http://localhost:3001/api";
+const baseUrl = `${settings.api_base_url}/api`;
 
 export async function exploredQuery(query: string): Promise<Entry[]> {
     try {
