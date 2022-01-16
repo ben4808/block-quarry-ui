@@ -2,11 +2,18 @@
     display: inline-block;
     clear: both;
     font-family: Verdana, sans-serif;
-    width: 1200px;
+    width: 1220px;
     min-height: 725px;
     vertical-align: top;
     background-color: #333;
     color: #ccc;
+}
+
+@media (max-width: 1500px) {
+    #Frontier {
+        width: 1040px;
+        min-height: 590px;
+    }
 }
 
 .frontier-button {

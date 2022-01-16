@@ -110,6 +110,7 @@ function Frontier(props: FrontierProps) {
         let selectedEntry = newFrontierEntries.find(x => x.isSelected);
         if (!selectedEntry) return;
 
+        selectedEntry.displayText = selectedEntry.displayText.replace(/^[,. ]+/, "").replace(/[,. ]+$/, "");
         let modifiedEntries = updateEntriesWithKeyPress([selectedEntry], key);
 
         for (let mod of modifiedEntries) {
@@ -138,12 +139,12 @@ function Frontier(props: FrontierProps) {
 
             props.entriesSelected([]);
         }
-            
     }
 
     let entryBatches = [] as Entry[][];
     let i = 0;
-    let entriesPerBatch = 23;
+    let viewportWidth = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    let entriesPerBatch = viewportWidth > 1500 ? 23 : 18;
     while(i < frontierEntries.length) {
         let newBatch = [] as Entry[];
         for (let j = 0; j < entriesPerBatch; j++) {
@@ -158,13 +159,13 @@ function Frontier(props: FrontierProps) {
         <div id="Frontier" onClick={handleDeselect}>
             <div id="topbar">
                 <label id="data-source-label" htmlFor="data-source-select">Data Source</label>
-                <select id="data-source-select" defaultValue="Podcasts" onChange={() => resetPage(false)}>
-                    <option value="Ginsberg">Ginsberg clues</option>
-                    <option value="Podcasts">Podcast database</option>
-                    <option value="Nutrimatic">Nutrimatic</option>
-                    <option value="OneLook">OneLook</option>
+                <select id="data-source-select" defaultValue="Newspapers" onChange={() => resetPage(false)}>
                     <option value="Newspapers">Newspapers</option>
                     <option value="Husic">Spread the Word List</option>
+                    <option value="OneLook">OneLook</option>
+                    <option value="Nutrimatic">Nutrimatic</option>
+                    <option value="Podcasts">Podcast database</option>
+                    <option value="Ginsberg">Ginsberg clues</option>
                 </select>
                 <div className="frontier-button" onClick={loadData}>Load</div>
 

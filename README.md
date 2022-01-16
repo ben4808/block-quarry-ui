@@ -1,46 +1,65 @@
-# Getting Started with Create React App
+# Block Quarry
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**Link to app**: http://blockquarry.net
 
-## Available Scripts
+Block Quarry is a free crowdsourced word list augmentation tool. It is used during construction to find extra entries not yet in your word list to fill the specific slot(s) you are trying to fill.
 
-In the project directory, you can run:
+## Quick Start
 
-### `npm start`
+1. Enter the slot you are trying to fill into the search bar, using `.` to indicate open squares. Hit Enter. The left panel will populate will all the entries in our database that fit your slot.
+<image>
+1. Hit the Export button, and a new tab will be populated with these entries in .dict format. Copy/paste this onto the top of your current .dict file and reload your construction software.
+<image>
+1. Find more lively fill for your puzzle!
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Discovering Brand New Entries
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+There are multitudes of fresh and lively entries out in the world that have never appeared in a published crossword or even a constructor's word list. This is especially true for entries longer than 7 or 8 letters. This app allows you, with a little effort from the highly trained neural net that is your brain, to discover these entries and immediately slot them into the puzzle you need to fill right now!
 
-### `npm test`
+The Block Quarry interface is broken into two major panels.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The left panel is the Explored Panel. Here resides the app's canonical word list. 
 
-### `npm run build`
+The right panel is the Frontier Panel. Here resides raw data gathered from various sources, much of which is frankly useless, but which does contain the diamonds in the rough that we are looking for. See the Data Sources section below for more details. To use the Frontier Panel:
+1. First enter your slot and load the Explored Panel.
+1. Select a data source from the dropdown and click Load. Some results span multiple pages, which you can move through one at a time.
+<image>
+1. When you find a good entry, click it to select it and then press the `S` key to add it to the Explored panel where it can be exported.
+<image>
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Note that you can and should do further scoring of entries as detailed in the next section.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Entry Scoring
+Entries are scored on two dimensions, as the traditional single 1-100 score doesn't seem sufficient.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**Quality Score**: 
 
-### `npm run eject`
+## Data Sources
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+The Explored Panel data comes from:
+- [Mark Diehl's trimmed version of the Peter Broda word list](https://www.facebook.com/groups/1515117638602016/permalink/2997721820341583) 
+- Entries from a body of puzzles from indie constructor blogs, which are consistently high quality. 
+- All the new discoveries that users have made.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The Frontier data comes from various data sources:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+**Newspapers**: A large list of entries gleaned from https://crosswordtracker.com/. This includes every entry ever published in major newspaper puzzles. There is lots of high quality stuff still to grab here but also lots of iffy stuff and theme answers that you would never use.
+**Spread The Word List**: A free word list maintained by Brooke Husic at https://www.spreadthewordlist.com/. This word list is also heavily based on newspaper entries, but also contains a number of goodies added by Brooke which are always delightful.
+**OneLook**: [OneLook](https://www.onelook.com/) is *the* goto spot for most constructors when they need to discover new entries. It aggregates a large number of online dictionary sites into one place in a searchable manner.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+The next three sources are the result of processing large corpuses of raw text to extract potential multiple word phrases. The algorithm is not fancy: groups of words that appear together often are assumed to be a potential phrase. This results in a large number of non-phrases and a small number of real phrases. Yet, among these real phrases lurks magic, and I encourage you to try your luck!
 
-## Learn More
+**Nutrimatic** [Nutrimatic](https://nutrimatic.org/) uses the full text dump of Wikipedia. Names, places, historical stuff, and whatever phrases Wikipedia writer like to use can be discovered here.
+**Podcasts** This is derived from a [huge dataset of podcast transcripts](https://podcastsdataset.byspotify.com/). Podcasts are a great entry source because they contain the stuff that people actually talk about, which is exactly what we want in our puzzles. Probably my favorite data source.
+**Ginsberg clues** This uses the excellent [Ginsberg clue database](http://tiwwdty.com/clue/). Both the entries and the clues themselves are indexed. Constructors turn up their creativity when writing clues, and the results often make great entries!
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+More data sources will likely be added in the future. Here are some of my ideas, but let me know your ideas as well!
+- Twitter trends/Current events/news sites/reddit scraper to try to capture the *really* fresh stuff.
+- The [Collaborative Word List](https://github.com/Crossword-Nexus/collaborative-word-list)
+- Your personal word list? If you're willing to donate, that would be awesome. I also want to make a way to upload your word list locally so you can contribute a few words without giving up all your data.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Full Word List
+Access to the full Explored word list .dict can be had by emailing me at ben4808@gmail.com. Please also consider small donation (completely optional) to help with server and development costs.
+
+## Contact
+You can contact me at ben4808@gmail.com or by submitting an issue to this repo. Please don't hesitate to contact me with any questions, comments, feedback, or contributions!

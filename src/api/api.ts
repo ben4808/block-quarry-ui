@@ -45,6 +45,7 @@ export async function discoverEntries(entries: ModifiedEntry[]): Promise<void> {
                 displayText: entry.displayText,
                 qualityScore: entry.qualityScore,
                 obscurityScore: entry.obscurityScore,
+                breakfastTestFailure: entry.breakfastTestFailure,
             } as Entry);
         }
 

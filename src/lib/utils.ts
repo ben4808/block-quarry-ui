@@ -52,11 +52,19 @@ export function getDictScoreForEntry(entry: Entry): number {
 }
 
 export function getDictScoreForEntryAlt(entry: Entry): number {
-    if (!entry.qualityScore) return 0;
-    return entry.qualityScore < 2 ? 25 : 
-        entry.qualityScore < 3 ? 40 :
+    if (!entry.qualityScore || !entry.obscurityScore) return 0;
+
+    let qualityPart = entry.qualityScore < 2 ? 10 : 
+        entry.qualityScore < 3 ? 30 :
         entry.qualityScore < 4 ? 50 : 
-        entry.qualityScore < 5 ? 60 : 75;
+        entry.qualityScore < 5 ? 70 : 90;
+
+    let obscurityPart = entry.obscurityScore < 2 ? -2 : 
+        entry.obscurityScore < 3 ? -1 :
+        entry.obscurityScore < 4 ? 0 : 
+        entry.obscurityScore < 5 ? 1 : 2;
+
+    return qualityPart + obscurityPart + (entry.breakfastTestFailure ? -5 : 0);
 }
 
 export function updateEntriesWithKeyPress(selectedEntries: Entry[], key: string): ModifiedEntry[] {
@@ -68,31 +76,42 @@ export function updateEntriesWithKeyPress(selectedEntries: Entry[], key: string)
             entry: entry.entry,
         } as ModifiedEntry;
 
-        if (key === "W") { entry.qualityScore = 5; modifiedEntry.qualityScore = 5; }
-        if (key === "A") { entry.qualityScore = 2; modifiedEntry.qualityScore = 2; }
-        if (key === "S") { entry.qualityScore = 3; modifiedEntry.qualityScore = 3; }
-        if (key === "D") { entry.qualityScore = 4; modifiedEntry.qualityScore = 4; }
-        if (key === "Z") { entry.qualityScore = 1; modifiedEntry.qualityScore = 1; }
-        if (key === "X") { entry.qualityScore = 0; modifiedEntry.qualityScore = 0; }
-        if (key === "0") { entry.obscurityScore = 0; modifiedEntry.obscurityScore = 0; }
-        if (key === "1") { entry.obscurityScore = 1; modifiedEntry.obscurityScore = 1; }
-        if (key === "2") { entry.obscurityScore = 2; modifiedEntry.obscurityScore = 2; }
-        if (key === "3") { entry.obscurityScore = 3; modifiedEntry.obscurityScore = 3; }
-        if (key === "4") { entry.obscurityScore = 4; modifiedEntry.obscurityScore = 4; }
-        if (key === "5") { entry.obscurityScore = 5; modifiedEntry.obscurityScore = 5; }
+        let qualityMappings = {"Z": 1, "A": 2, "S": 3, "D": 4, "W": 5};
+        let obscurityMappings = {"1": 1, "2": 2, "3": 3, "4": 4, "5": 5};
+
+        for (let [k, v] of Object.entries(qualityMappings)) {
+            if (k === key && entry.qualityScore !== v) {
+                entry.qualityScore = v;
+                modifiedEntry.qualityScore = v;
+            }
+        }
+
+        for (let [k, v] of Object.entries(obscurityMappings)) {
+            if (k === key && entry.obscurityScore !== v) {
+                entry.obscurityScore = v;
+                modifiedEntry.obscurityScore = v;
+            }
+        }
+
+        if (key === "X") {
+            entry.breakfastTestFailure = !entry.breakfastTestFailure;
+            modifiedEntry.breakfastTestFailure = !modifiedEntry.breakfastTestFailure;
+        }
 
         if (selectedEntries.length === 1 && key === 'R') {
             let newText = prompt("Enter new display text:", entry.displayText);
             if (newText) {
                 let normalized = newText.replaceAll(/[^A-Za-z]/g, "");
-                if (normalized.toUpperCase() === entry.entry) {
-                    entry.displayText = newText;
+                if (normalized.toUpperCase() === entry.entry && newText !== entry.displayText) {
+                    if (entry.dataSourceScore !== undefined)
+                        entry.displayText = newText;
                     modifiedEntry.displayText = newText;
                 }
             }
         }
 
-        if (modifiedEntry.displayText || modifiedEntry.qualityScore || modifiedEntry.obscurityScore)
+        if (modifiedEntry.displayText || modifiedEntry.qualityScore || modifiedEntry.obscurityScore
+            || modifiedEntry.breakfastTestFailure !== undefined)
             modifiedEntries.push(modifiedEntry);
     }
 

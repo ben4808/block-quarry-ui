@@ -3,4 +3,5 @@ export interface ModifiedEntry {
     displayText?: string;
     qualityScore?: number;
     obscurityScore?: number;
+    breakfastTestFailure?: boolean;
 }

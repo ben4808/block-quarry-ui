@@ -55,6 +55,7 @@ function App() {
                 modifiedEntry.displayText = modifiedEntry.displayText || existingBufferEntry.displayText;
                 modifiedEntry.qualityScore = modifiedEntry.qualityScore || existingBufferEntry.qualityScore;
                 modifiedEntry.obscurityScore = modifiedEntry.obscurityScore || existingBufferEntry.obscurityScore;
+                modifiedEntry.breakfastTestFailure = modifiedEntry.breakfastTestFailure || existingBufferEntry.breakfastTestFailure;
             }
 
             let existingEntry = newEntriesMap.get(modifiedEntry.entry);
@@ -66,15 +67,18 @@ function App() {
                     obscurityScore: 3,
                     isExplored: true,
                     isSelected: true,
+                    breakfastTestFailure: false,
                 } as Entry;
                 newEntriesMap.set(existingEntry.entry, existingEntry);
 
                 modifiedEntry.qualityScore = modifiedEntry.qualityScore || 3;
                 modifiedEntry.obscurityScore = modifiedEntry.obscurityScore || 3;
+                modifiedEntry.breakfastTestFailure = modifiedEntry.breakfastTestFailure || false;
             }
             existingEntry.displayText = modifiedEntry.displayText || existingEntry.displayText;
             existingEntry.qualityScore = modifiedEntry.qualityScore || existingEntry.qualityScore;
             existingEntry.obscurityScore = modifiedEntry.obscurityScore || existingEntry.obscurityScore;
+            existingEntry.breakfastTestFailure = modifiedEntry.breakfastTestFailure || existingEntry.breakfastTestFailure;
             existingEntry.isModified = true;
             editBuffer.current.push(modifiedEntry);
         }
@@ -85,11 +89,13 @@ function App() {
     async function sendEdits() {
         if (editBuffer.current.length === 0) return;
 
-        await discoverEntries(editBuffer.current);
+        let bufferToSend = deepClone(editBuffer.current) as ModifiedEntry[];
         editBuffer.current = [];
+
+        await discoverEntries(bufferToSend);
     }
 
-    useInterval(sendEdits, 5000);
+    useInterval(sendEdits, 3000);
 
     return (
         <>

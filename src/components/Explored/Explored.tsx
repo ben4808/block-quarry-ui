@@ -8,8 +8,8 @@ import { ExploredProps } from './ExploredProps';
 
 function Explored(props: ExploredProps) {
     const [lastSelectedKey, setLastSelectedKey] = useState("");
-    const [exportOnlyChanges, setExportOnlyChanges] = useState(true);
-    const [exportOnlySelected, setExportOnlySelected] = useState(false);
+    const [exportOnlyModified, setExportOnlyModified] = useState(false);
+    const [exportExcludeLowRated, setExportExcludeLowRated] = useState(true);
     const [updateSemaphore, setUpdateSemaphore] = useState(0);
 
     const entryArray = useRef([] as Entry[]);
@@ -124,25 +124,33 @@ function Explored(props: ExploredProps) {
         props.entriesModified(modifiedEntries);
     }
 
-    function handleOnlyChangesToggle() {
-        setExportOnlyChanges(!exportOnlyChanges);
+    function handleOnlyModifiedToggle() {
+        setExportOnlyModified(!exportOnlyModified);
     }
 
-    function handleOnlySelectedToggle() {
-        setExportOnlySelected(!exportOnlySelected);
+    function handleExcludeLowRatedToggle() {
+        setExportExcludeLowRated(!exportExcludeLowRated);
     }
 
     function exportEntries() {
         let lines = [] as string[];
 
         entryArray.current.forEach(entry => {
-            if (exportOnlyChanges && !entry.isModified) return;
-            if (exportOnlySelected && !entry.isSelected) return;
+            if (exportOnlyModified && !entry.isModified) return;
+            if (exportExcludeLowRated && isEntryLowRated(entry)) return;
 
             lines.push(`${entry.entry};${getDictScoreForEntryAlt(entry)}`);
         }); 
         
         window.open()!.document.write(`<pre>${lines.join("\n")}</pre>`);
+    }
+
+    function isEntryLowRated(entry: Entry) {
+        if (entry.qualityScore! < 2) return true;
+        if (entry.obscurityScore! < 2 && entry.qualityScore! < 3) return true;
+        if (entry.breakfastTestFailure) return true;
+
+        return false;
     }
 
     function addNewEntry(event: any) {
@@ -167,19 +175,19 @@ function Explored(props: ExploredProps) {
             <div id="topbar">
                 <div className="fill-list-button" onClick={exportEntries}>Export</div>
                 <div className="fill-sec-checkboxes">
-                    <input type="checkbox" className="section-checkbox" id="onlyChanges"
-                                checked={exportOnlyChanges} onChange={handleOnlyChangesToggle} />
-                    <label htmlFor="onlyChanges">Only Changes</label>
+                    <input type="checkbox" className="section-checkbox" id="onlyModified"
+                                checked={exportOnlyModified} onChange={handleOnlyModifiedToggle} />
+                    <label htmlFor="onlyModified">Only Modified</label>
                     <br />
-                    <input type="checkbox" className="section-checkbox" id="onlySelected"
-                                checked={exportOnlySelected} onChange={handleOnlySelectedToggle} />
-                    <label htmlFor="onlySelected">Only Selected</label>
+                    <input type="checkbox" className="section-checkbox" id="excludeLowRated"
+                                checked={exportExcludeLowRated} onChange={handleExcludeLowRatedToggle} />
+                    <label htmlFor="excludeLowRated">Exclude Low Rated</label>
                 </div>
             </div>
             <div id="topbar2">
                 <input type="text" id="new-entry" placeholder="Add Entry..." onKeyDown={addNewEntry}></input>
             </div>
-            <div onKeyDown={handleKeyDown} onClick={handleEntryClick} tabIndex={0}>
+            <div onKeyDown={handleKeyDown} onClick={handleEntryClick} tabIndex={0} id="explored-entries">
                 {props.exploredLoading &&
                     <div>Loading...</div>
                 }

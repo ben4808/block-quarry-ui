@@ -10,4 +10,5 @@ export interface Entry {
     isModified?: boolean;
     isSelected?: boolean;
     tags?: Map<string, boolean>;
+    breakfastTestFailure: boolean;
 }
