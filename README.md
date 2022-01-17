@@ -6,13 +6,15 @@ Block Quarry is a free crowd-sourced word list augmentation tool for crossword c
 
 ## Quick Start
 
+![Screenshot 1](/public/tutorial.png)
+
 1. Enter the pattern you are trying to fill into the search bar, using `.` to indicate open squares. Hit Enter. The left panel will populate with all the matching entries in the database.
-<image>
 1. Click the Export button, and a new tab will be populated with these entries in .dict format. Copy/paste this onto the top of your current .dict file and reload your construction software.
-<image>
 1. Find more lively fill for your grid!
 
 ## Discovering Brand New Entries
+
+<img src="/public/tutorial2.png" width="500" />
 
 There exist multitudes of fresh and lively entries, espcially long ones, that have never appeared in a published crossword or even a constructor's word list. This app allows you, with a little effort from the highly trained neural net that is your brain, to discover these entries and immediately apply them to your puzzle!
 
@@ -23,18 +25,43 @@ The left panel is the Explored Panel. Here resides the app's canonical word list
 The right panel is the Frontier Panel. Here resides raw data gathered from various sources. Much of this data is frankly useless, but it does contain diamonds in the rough. See the Data Sources section below for more details. To use the Frontier Panel:
 1. Load the Explored Panel with your pattern.
 1. Select a data source from the dropdown on the Frontier Panel and click Load. Some result sets will span multiple pages.
-<image>
 1. When you discover a good entry, click it to select it and then press the `S` key to add it to the Explored Panel, where it can be exported.
-<image>
 
 You can and should do further scoring of entries as detailed in the next section.
 
 ## Entry Scoring
-Entries are scored on two dimensions, as the traditional single 1-100 score doesn't seem sufficient. Scores are still converted back to a 1-100 format when exporting .dict files.
+Entries are scored on two dimensions, as the traditional 1-100 seems a bit limiting. Scores are converted back to a 1-100 format when exporting .dict files.
 
-**Quality Score** runs from 1-5. The average quality score of an entry is indicated by its background color, where more green is good and more red is bad.
+<img src="/public/quality_examples.png" width="500" />
+
+**Quality Score**
+
+5: Awesome (hotkey: `W`). This entry is fresh and topical and lively and would make an great marquee seed for a themeless.\
+4: Great (hotkey: `D`). This entry sparks joy. It would make a great bonus down in a themed puzzle.\
+3: Normal (hotkey: `S`). This is typical, unmemorable fill that makes up the majority of most puzzles.\
+2: Filler (hotkey: `A`). You would prefer to avoid these, but sometimes that pesky corner won't fill without one or two.\
+1: Iffy (hotkey: `Z`). This isn't a thing and/or you would never use it in your puzzle. It should be deleted from the world list.
   
+<img src="/public/obscurity_examples.png" width="450" />
 
+**Obscurity Score**
+
+5: Everyday (hotkey: `5`). Five year olds know this entry. \
+4: Common (hotkey: `4`). Pretty much everybody knows this entry. It makes for smooth Monday fill. \
+3: Known (hotkey: `3`). Most of your solvers will likely know this entry. Makes up the majority of most puzzles. \
+2: Obscure (hotkey: `2`). This entry might stetch the vocabulary of your solvers. You may want to avoid crossing two of these. \
+1: Arcane (hotkey: `1`). Only solvers with specialized knowledge will get this one without all the crosses. Unless paired with a higher quality score, this should be deleted from the word list.
+
+<img src="/public/bfast_example.png" width="80" />
+
+**Sunday Morning Breakfast Test**
+
+(hotkey: `X`). Entries not passing the Sunday Morning Breakfast Test might not be acceptable by major publications because they are offensive, obscene, sexual, triggering, etc. Use these at your own risk.
+
+### Notes
+It takes a lot of effort to appropriately categorize large numbers of entries, which is why the majority of entries in the database use a simple shortcut: quality 3 if we'd be happy to have it in our puzzle or quality 2 otherwise. If you want to see the potential of the two-dimensional system, query the pattern `Z...`. Eventually this should allow us to generate custom word lists targeting different difficulty levels without sacrificing fill quality.
+
+Your edits will apply to everybody that uses the site. When people express different opinions on a categorization, an average is taken. However, the scores you have given will be shown back to you, regardless of what others have said. If you would like to reset to the community consensus, just clear your cookies.
 
 ## Data Sources
 
