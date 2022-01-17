@@ -51,11 +51,11 @@ The Frontier data comes from various data sources:
   
 **[OneLook](https://www.onelook.com/)**: This is *the* go-to spot for most constructors when they need new entries. It aggregates a large number of online dictionary sites into one place in a searchable manner.
 
-The next three sources are the result of processing large corpuses of raw text to extract potential multiple word phrases. The algorithm is not fancy: groups of words that appear together often are assumed to be a potential phrase. This results in a large number of non-phrases and a small number of real phrases. Yet, among these real phrases lurks magic, and I encourage you to try your luck!
+The next three sources are the result of processing large corpuses of raw text to extract potential multiple word phrases. The algorithm is not fancy: groups of words that appear together often are assumed to be a potential phrase. This results in a large number of non-phrases and a small number of real phrases. Yet, among these real phrases lurks magic, and I encourage you to try your hand!
 
 **[Nutrimatic](https://nutrimatic.org/)** uses the full text dump of Wikipedia. Names, places, historical stuff, and whatever stuff Wikipedia writers like to use can be discovered here.
 
-**Podcasts** is derived from a [huge dataset of podcast transcripts](https://podcastsdataset.byspotify.com/). Podcasts are a great entry source because they contain the stuff that people actually talk about, which is exactly what we want in our puzzles. Probably my favorite data source.
+**Podcasts** is derived from a [huge dataset of podcast transcripts](https://podcastsdataset.byspotify.com/). Podcasts are a great entry source because they contain the stuff that people actually talk about, which is exactly what we want in our puzzles. This is my personal favorite data source.
 
 **Ginsberg clues** uses the excellent [Matt Ginsberg clue database](http://tiwwdty.com/clue/). Both the entries and the clues themselves are indexed. Constructors turn up their creativity when writing clues, and the results often make for great entries!
 

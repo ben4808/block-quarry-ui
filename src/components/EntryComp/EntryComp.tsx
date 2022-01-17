@@ -56,6 +56,10 @@ function EntryComp(props: EntryCompProps) {
                 }}>
                 {props.entry.displayText}
             </div>
+            {!props.isFrontier && 
+                <div className={"bfast-bar" +
+                (props.entry.breakfastTestFailure ? " bfast-bar-red" : "")}></div>
+            }
         </div>
     );
 };

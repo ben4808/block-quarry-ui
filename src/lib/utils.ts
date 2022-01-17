@@ -95,7 +95,7 @@ export function updateEntriesWithKeyPress(selectedEntries: Entry[], key: string)
 
         if (key === "X") {
             entry.breakfastTestFailure = !entry.breakfastTestFailure;
-            modifiedEntry.breakfastTestFailure = !modifiedEntry.breakfastTestFailure;
+            modifiedEntry.breakfastTestFailure = entry.breakfastTestFailure;
         }
 
         if (selectedEntries.length === 1 && key === 'R') {
@@ -103,7 +103,7 @@ export function updateEntriesWithKeyPress(selectedEntries: Entry[], key: string)
             if (newText) {
                 let normalized = newText.replaceAll(/[^A-Za-z]/g, "");
                 if (normalized.toUpperCase() === entry.entry && newText !== entry.displayText) {
-                    if (entry.dataSourceScore !== undefined)
+                    if (entry.dataSourceScore === undefined)
                         entry.displayText = newText;
                     modifiedEntry.displayText = newText;
                 }

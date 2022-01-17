@@ -37,6 +37,18 @@
     background-color: darken(mediumseagreen, 10%);
 }
 
+.bfast-bar {
+    display: inline-block;
+    width: 5px;
+    margin: 0 5px;
+    height: 23px;
+    position: relative;
+    top: 2px;
+}
+.bfast-bar-red {
+    background-color: darkred;
+}
+
 .entry-shell {
     display: block;
     height: 27px;

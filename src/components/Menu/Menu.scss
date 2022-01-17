@@ -32,3 +32,20 @@
     margin-left: 50px;
     margin-right: 7px;
 }
+
+#help-button {
+    float: left;
+    margin-left: 100px;
+    background-color: #ccc;
+    border-radius: 5px;
+    border: 2px solid #666;
+    padding: 4px 15px;
+    text-decoration: none;
+    color: #333;
+    position: relative;
+    top: -7px;
+
+    &:hover {
+        background-color: #bbb;
+    }
+}

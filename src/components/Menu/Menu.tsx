@@ -20,6 +20,8 @@ function Menu(props: MenuProps) {
 
             <div className="menu-label">Query: </div>
             <input type="text" className="form-control" id="queryTextbox" placeholder="B..CKQ..R.Y" onKeyDown={checkForEnter} />
+
+            <a id="help-button" href="https://github.com/ben4808/block-quarry-ui/blob/main/README.md" target="_blank" rel="noreferrer">Help</a>
         </div>
     );
 }

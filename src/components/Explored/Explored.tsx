@@ -33,13 +33,18 @@ function Explored(props: ExploredProps) {
 
         if (entryArray.current.length === 0) {
             let scoreDict = new Map<string, number>();
+            let bfastDict = new Map<string, boolean>();
             for (let entry of mapValues(newEntries)) {
                 scoreDict.set(entry.entry, getDictScoreForEntry(entry));
+                bfastDict.set(entry.entry, entry.breakfastTestFailure);
             }
 
             let sorted = mapKeys(scoreDict).sort((a, b) => {
-                if (scoreDict.get(b)! === scoreDict.get(a)!) return a < b ? -1 : 1;
-                return scoreDict.get(b)! - scoreDict.get(a)!;
+                let scoresEqual = scoreDict.get(b)! === scoreDict.get(a)!;
+                let bfastEqual = bfastDict.get(b)! === bfastDict.get(a)!;
+                if (scoresEqual && bfastEqual) return a < b ? -1 : 1;
+                if (bfastEqual) return scoreDict.get(b)! - scoreDict.get(a)!;
+                return bfastDict.get(b)! ? -1 : 1;
             });
             for (let key of sorted) {
                 newArray.push(newEntries.get(key)!);
@@ -187,7 +192,7 @@ function Explored(props: ExploredProps) {
             <div id="topbar2">
                 <input type="text" id="new-entry" placeholder="Add Entry..." onKeyDown={addNewEntry}></input>
             </div>
-            <div onKeyDown={handleKeyDown} onClick={handleEntryClick} tabIndex={0} id="explored-entries">
+            <div onKeyDown={handleKeyDown} onClick={handleEntryClick} tabIndex={0}>
                 {props.exploredLoading &&
                     <div>Loading...</div>
                 }

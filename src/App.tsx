@@ -55,7 +55,8 @@ function App() {
                 modifiedEntry.displayText = modifiedEntry.displayText || existingBufferEntry.displayText;
                 modifiedEntry.qualityScore = modifiedEntry.qualityScore || existingBufferEntry.qualityScore;
                 modifiedEntry.obscurityScore = modifiedEntry.obscurityScore || existingBufferEntry.obscurityScore;
-                modifiedEntry.breakfastTestFailure = modifiedEntry.breakfastTestFailure || existingBufferEntry.breakfastTestFailure;
+                modifiedEntry.breakfastTestFailure = modifiedEntry.breakfastTestFailure !== undefined ?
+                    modifiedEntry.breakfastTestFailure : existingBufferEntry.breakfastTestFailure;
             }
 
             let existingEntry = newEntriesMap.get(modifiedEntry.entry);
@@ -78,7 +79,8 @@ function App() {
             existingEntry.displayText = modifiedEntry.displayText || existingEntry.displayText;
             existingEntry.qualityScore = modifiedEntry.qualityScore || existingEntry.qualityScore;
             existingEntry.obscurityScore = modifiedEntry.obscurityScore || existingEntry.obscurityScore;
-            existingEntry.breakfastTestFailure = modifiedEntry.breakfastTestFailure || existingEntry.breakfastTestFailure;
+            existingEntry.breakfastTestFailure = modifiedEntry.breakfastTestFailure !== undefined ?
+                modifiedEntry.breakfastTestFailure : existingEntry.breakfastTestFailure;
             existingEntry.isModified = true;
             editBuffer.current.push(modifiedEntry);
         }

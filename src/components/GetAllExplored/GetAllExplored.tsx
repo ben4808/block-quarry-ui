@@ -18,7 +18,7 @@ function GetAllExplored(props: GetAllExploredProps) {
         let lines = [] as string[];
         for (let result of results) {
             if (props.outputFormat === "csv")
-                lines.push(`${result.entry},"${result.displayText}",${result.qualityScore?.toFixed(2)},${result.obscurityScore?.toFixed(2)}`);
+                lines.push(`${result.entry},"${result.displayText}",${result.qualityScore?.toFixed(2)},${result.obscurityScore?.toFixed(2)},${result.breakfastTestFailure ? "1" : "0"}`);
             else
                 lines.push(`${result.entry};${getDictScoreForEntryAlt(result)}`);
         }
