@@ -58,6 +58,10 @@ Entries are scored on two dimensions, as the traditional 1-100 seems a bit limit
 
 (hotkey: `X`). Entries not passing the Sunday Morning Breakfast Test might not be acceptable by major publications because they are offensive, obscene, sexual, triggering, etc. Use these at your own risk.
 
+**Display Text**
+
+(hotkey: `R`). Entries are presented in a human-readable format rather than ALLUPPERCASE. This make scanning through lots of entries much easier on the eyes. This display text comes mass-applied from my Podcasts dataset, and so a lot of weird quirks got through. Feel free to correct the quirks you see by pressing `R` and entering better text. You can add spaces and punctuation, but you must keep the letters in the correct order.
+
 ### Notes
 It takes a lot of effort to appropriately categorize large numbers of entries, which is why the majority of entries in the database use a simple shortcut: quality 3 if we'd be happy to have it in our puzzle or quality 2 otherwise. If you want to see the potential of the two-dimensional system, query the pattern `Z...`. Eventually this should allow us to generate custom word lists targeting different difficulty levels without sacrificing fill quality.
 
