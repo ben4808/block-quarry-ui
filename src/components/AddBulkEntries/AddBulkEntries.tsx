@@ -26,7 +26,7 @@ function AddBulkEntries() {
   
         let regex1 = line.match(/^"?(.+?)"?$/);
         let regex2_noScore = line.match(/^([a-zA-Z]+?)[;,]"?(.+?)"?$/);
-        let regex2_score = line.match(/^"?(.+?)\?[;,]([0-9]+)$/);
+        let regex2_score = line.match(/^"?(.+?)"?[;,]([0-9]+)$/);
         let regex3 = line.match(/^([a-zA-Z]+?)[;,]"?(.+?)"?[;,]([0-9]+)$/);
 
         if (regex3) {
