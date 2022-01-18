@@ -3,7 +3,7 @@ import { Entry } from "../models/Entry";
 import { ModifiedEntry } from "../models/ModifiedEntry";
 import settings from "../settings.json";
 
-const baseUrl = `${settings.api_base_url}/api`;
+const baseUrl = settings.api_base_url;
 
 export async function exploredQuery(query: string): Promise<Entry[]> {
     try {
