@@ -110,7 +110,6 @@ function Frontier(props: FrontierProps) {
         let selectedEntry = newFrontierEntries.find(x => x.isSelected);
         if (!selectedEntry) return;
 
-        selectedEntry.displayText = selectedEntry.displayText.replace(/^[,. ]+/, "").replace(/[,. ]+$/, "");
         let modifiedEntries = updateEntriesWithKeyPress([selectedEntry], key);
 
         for (let mod of modifiedEntries) {
@@ -166,6 +165,9 @@ function Frontier(props: FrontierProps) {
                     <option value="Nutrimatic">Nutrimatic</option>
                     <option value="Podcasts">Podcast database</option>
                     <option value="Ginsberg">Ginsberg clues</option>
+                    <option value="Jeopardy">Jeopardy answers</option>
+                    <option value="Fortune">Wheel of Fortune</option>
+                    <option value="Twitter">Twitter trends</option>
                 </select>
                 <div className="frontier-button" onClick={loadData}>Load</div>
 

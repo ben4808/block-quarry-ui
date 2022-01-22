@@ -63,7 +63,9 @@ function App() {
             if (!existingEntry) {
                 existingEntry = {
                     entry: modifiedEntry.entry,
-                    displayText: modifiedEntry.displayText!,
+                    displayText: modifiedEntry.displayText!
+                        .replace(/^[,. ]+/, "").replace(/[,. ]+$/, "")
+                        .normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
                     qualityScore: 3,
                     obscurityScore: 3,
                     isExplored: true,
