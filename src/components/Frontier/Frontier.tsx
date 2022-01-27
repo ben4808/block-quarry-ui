@@ -34,6 +34,9 @@ function Frontier(props: FrontierProps) {
     }, [page]);
 
     async function loadData() {
+        if (!props.query)
+            return;
+
         setIsLoading(true);
         let dataSource = (document.getElementById("data-source-select") as HTMLSelectElement)!.value;
         let results = await frontierQuery(props.query, dataSource, page);
@@ -112,10 +115,8 @@ function Frontier(props: FrontierProps) {
 
         let modifiedEntries = updateEntriesWithKeyPress([selectedEntry], key);
 
-        for (let mod of modifiedEntries) {
-            if (!props.exploredEntries.has(mod.entry)) {
-                mod.displayText = selectedEntry.displayText;
-            }
+        if (modifiedEntries.length > 0 && !props.exploredEntries.has(modifiedEntries[0].entry)) {
+            modifiedEntries[0].displayText = selectedEntry.displayText;
         }
 
         setFrontierEntries(newFrontierEntries);

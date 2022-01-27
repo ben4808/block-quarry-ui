@@ -61,11 +61,13 @@ function App() {
 
             let existingEntry = newEntriesMap.get(modifiedEntry.entry);
             if (!existingEntry) {
+                let newDisplayText = modifiedEntry.displayText!
+                .replace(/^[,. ]+/, "").replace(/[,. ]+$/, "")
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
                 existingEntry = {
                     entry: modifiedEntry.entry,
-                    displayText: modifiedEntry.displayText!
-                        .replace(/^[,. ]+/, "").replace(/[,. ]+$/, "")
-                        .normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+                    displayText: newDisplayText,
                     qualityScore: 3,
                     obscurityScore: 3,
                     isExplored: true,
@@ -74,15 +76,13 @@ function App() {
                 } as Entry;
                 newEntriesMap.set(existingEntry.entry, existingEntry);
 
-                modifiedEntry.qualityScore = modifiedEntry.qualityScore || 3;
-                modifiedEntry.obscurityScore = modifiedEntry.obscurityScore || 3;
-                modifiedEntry.breakfastTestFailure = modifiedEntry.breakfastTestFailure || false;
+                modifiedEntry.displayText = newDisplayText;
             }
             existingEntry.displayText = modifiedEntry.displayText || existingEntry.displayText;
-            existingEntry.qualityScore = modifiedEntry.qualityScore || existingEntry.qualityScore;
-            existingEntry.obscurityScore = modifiedEntry.obscurityScore || existingEntry.obscurityScore;
+            existingEntry.qualityScore = modifiedEntry.qualityScore || existingEntry.qualityScore || 3;
+            existingEntry.obscurityScore = modifiedEntry.obscurityScore || existingEntry.obscurityScore || 3;
             existingEntry.breakfastTestFailure = modifiedEntry.breakfastTestFailure !== undefined ?
-                modifiedEntry.breakfastTestFailure : existingEntry.breakfastTestFailure;
+                modifiedEntry.breakfastTestFailure : !!existingEntry.breakfastTestFailure;
             existingEntry.isModified = true;
             editBuffer.current.push(modifiedEntry);
         }
