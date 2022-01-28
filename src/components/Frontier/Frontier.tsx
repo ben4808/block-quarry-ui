@@ -169,6 +169,7 @@ function Frontier(props: FrontierProps) {
                     <option value="Jeopardy">Jeopardy answers</option>
                     <option value="Fortune">Wheel of Fortune</option>
                     <option value="Twitter">Twitter trends</option>
+                    <option value="Amazon">Amazon products</option>
                 </select>
                 <div className="frontier-button" onClick={loadData}>Load</div>
 
